@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/main_View">
+
+    <fragment
+        android:id="@+id/main_View"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.Main_View"
+        android:label="fragment_main__view"
+        tools:layout="@layout/fragment_main__view" >
+        <action
+            android:id="@+id/action_main_View_to_formularioFragment"
+            app:destination="@id/formularioFragment" />
+        <action
+            android:id="@+id/action_main_View_to_settingsFragment"
+            app:destination="@id/settingsFragment2" />
+        <action
+            android:id="@+id/action_main_View_to_resultadosPruebaFragment"
+            app:destination="@id/resultadosPruebaFragment" />
+        <action
+            android:id="@+id/action_main_View_to_sobreelAppFragment"
+            app:destination="@id/sobreelAppFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/formularioFragment"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.formularioFragment"
+        android:label="fragment_formulario"
+        tools:layout="@layout/fragment_formulario" >
+        <action
+            android:id="@+id/action_formularioFragment_to_formularioConSintomasFragment"
+            app:destination="@id/formularioConSintomasFragment" />
+        <action
+            android:id="@+id/action_formularioFragment_to_formularioSinSintomasFragment"
+            app:destination="@id/formularioSinSintomasFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/formularioConSintomasFragment"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.FormularioConSintomasFragment"
+        android:label="fragment_formulario_con_sintomas"
+        tools:layout="@layout/fragment_formulario_con_sintomas" >
+        <action
+            android:id="@+id/action_formularioConSintomasFragment_to_main_View"
+            app:destination="@id/main_View" />
+    </fragment>
+    <fragment
+        android:id="@+id/formularioSinSintomasFragment"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.FormularioSinSintomasFragment"
+        android:label="fragment_formulario_sin_sintomas"
+        tools:layout="@layout/fragment_formulario_sin_sintomas" >
+        <action
+            android:id="@+id/action_formularioSinSintomasFragment_to_main_View"
+            app:destination="@id/main_View" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment2"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment2_to_main_View"
+            app:destination="@id/main_View" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultadosPruebaFragment"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.ResultadosPruebaFragment"
+        android:label="fragment_resultados_prueba"
+        tools:layout="@layout/fragment_resultados_prueba" >
+        <action
+            android:id="@+id/action_resultadosPruebaFragment_to_main_View"
+            app:destination="@id/main_View" />
+        <action
+            android:id="@+id/action_resultadosPruebaFragment_to_resultadoPruebaPositivoFragment"
+            app:destination="@id/resultadoPruebaPositivoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultadoPruebaPositivoFragment"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.ResultadoPruebaPositivoFragment"
+        android:label="fragment_resultado_prueba_positivo"
+        tools:layout="@layout/fragment_resultado_prueba_positivo" >
+        <action
+            android:id="@+id/action_resultadoPruebaPositivoFragment_to_main_View"
+            app:destination="@id/main_View" />
+    </fragment>
+    <fragment
+        android:id="@+id/sobreelAppFragment"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.SobreelAppFragment"
+        android:label="fragment_sobreel_app"
+        tools:layout="@layout/fragment_sobreel_app" >
+        <action
+            android:id="@+id/action_sobreelAppFragment_to_main_View"
+            app:destination="@id/main_View" />
+    </fragment>
+</navigation>

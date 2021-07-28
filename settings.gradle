@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "Ucab Covid-19 Contact Tracing"

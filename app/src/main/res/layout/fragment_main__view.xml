@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.Main_View">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight=".8"
+                android:text="Aqui indica si esta funcionando el contact tracing"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                >
+
+                <Button
+                    android:id="@+id/main_boton_sintomas"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/sintomas"
+                    android:layout_marginVertical="0dp"
+                    android:textSize="20sp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/negro_fondo"
+                    android:backgroundTint="@color/celeste"
+                    app:cornerRadius="100dp" />
+
+                <Button
+                    android:id="@+id/main_boton_Resultadospruebas"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginVertical="0dp"
+                    android:text="@string/resultados_de_prueba"
+                    android:textSize="20sp"
+                    android:textColor="@color/negro_fondo"
+                    android:backgroundTint="@color/celeste"
+                    android:gravity="center_vertical"
+                    app:cornerRadius="100dp"/>
+
+                <Button
+                    android:id="@+id/main_boton_contactTracing"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginVertical="0dp"
+                    android:text="@string/seguimiento_de_contactos_cercanos"
+                    android:textSize="20sp"
+                    android:textColor="@color/negro_fondo"
+                    android:backgroundTint="@color/celeste"
+                    android:gravity="center_vertical"
+                    app:cornerRadius="100dp"/>
+
+                <Button
+                    android:id="@+id/main_boton_SobreelApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginVertical="0dp"
+                    android:text="@string/sobre_la_aplicacion"
+                    android:textSize="20sp"
+                    android:textColor="@color/negro_fondo"
+                    android:backgroundTint="@color/celeste"
+                    android:gravity="center_vertical"
+                    app:cornerRadius="100dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

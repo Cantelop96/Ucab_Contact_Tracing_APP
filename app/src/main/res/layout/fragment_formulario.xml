@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.formularioFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_editor_absoluteX="-1dp"
+        tools:layout_editor_absoluteY="-1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="40dp"
+            android:gravity="top"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:text="Selecciona los sintomas que posees"
+                android:textSize="30dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:text="Si no posee ninguno de estos sintomas, no es necesario que hagas nada por los momentos."
+                android:textSize="20dp" />
+
+            <CheckBox
+                android:id="@+id/rb_fiebre_alta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:button="@android:drawable/checkbox_off_background"
+                android:checked="false"
+                android:text="Fiebre Alta\n Esto significa que se siente caliente al tacto en el pecho o en la espalda, no hace falta medir la temperatura con un termometro"
+                android:textSize="16dp" />
+
+            <CheckBox
+                android:id="@+id/rb_tos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:button="@android:drawable/checkbox_off_background"
+                android:text="Tos Frecuente\n Esto significa que lleva tosiendo constante mente por aproximadamente una hora, o tres o mas episodios de tos en 24 horas (Si usted normalmente posee tos, esta es peor a la tos usual)"
+                android:textSize="16dp" />
+
+            <CheckBox
+                android:id="@+id/rb_perdidadeOlfatoGusto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:button="@android:drawable/checkbox_off_background"
+                android:text="Perdida del Olfato o el Gusto\n Esto significa que no sientes sabor en las comidas o sientes olores"
+                android:textSize="16dp" />
+
+            <Button
+                android:id="@+id/btnsiguente_sintomas_boton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Siguiente"
+                android:textColor="@color/negro_fondo"
+                android:textSize="16dp"
+                app:backgroundTint="@color/celeste"
+                app:cornerRadius="100dp" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
