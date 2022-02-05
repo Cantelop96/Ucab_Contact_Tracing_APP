@@ -42,7 +42,7 @@
                 android:layout_marginVertical="10dp"
                 android:button="@android:drawable/checkbox_off_background"
                 android:checked="false"
-                android:text="Fiebre Alta\n Esto significa que se siente caliente al tacto en el pecho o en la espalda, no hace falta medir la temperatura con un termometro"
+                android:text="Fiebre Alta\n Significa que se siente caliente al tacto en el pecho o en la espalda, no hace falta medir la temperatura con un termometro"
                 android:textSize="16dp" />
 
             <CheckBox
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
                 android:button="@android:drawable/checkbox_off_background"
-                android:text="Tos Frecuente\n Esto significa que lleva tosiendo constante mente por aproximadamente una hora, o tres o mas episodios de tos en 24 horas (Si usted normalmente posee tos, esta es peor a la tos usual)"
+                android:text="Tos Frecuente\n Significa que lleva tosiendo constante mente por aproximadamente una hora, o tres o mas episodios de tos en 24 horas (Si usted normalmente posee tos, esta es peor a la tos usual)"
                 android:textSize="16dp" />
 
             <CheckBox
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
                 android:button="@android:drawable/checkbox_off_background"
-                android:text="Perdida del Olfato o el Gusto\n Esto significa que no sientes sabor en las comidas o sientes olores"
+                android:text="Perdida del Olfato o el Gusto\n Significa que no sientes sabor en las comidas o sientes olores"
                 android:textSize="16dp" />
 
             <Button
