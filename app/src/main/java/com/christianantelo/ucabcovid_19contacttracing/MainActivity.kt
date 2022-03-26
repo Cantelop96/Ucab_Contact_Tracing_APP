@@ -53,6 +53,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if(fragmentManager.backStackEntryCount==0){
+            super.onBackPressed()
+        }
+        else {
+            fragmentManager.popBackStack()
+        }
+
+    }
+
     private fun scanLeDevice() {
         if (!scanning) { // Stops scanning after a pre-defined scan period.
             handler.postDelayed({

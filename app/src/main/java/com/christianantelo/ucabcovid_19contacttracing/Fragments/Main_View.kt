@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.fragment_main__view.*
 
 class Main_View : Fragment() {
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,12 +28,21 @@ class Main_View : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         main_boton_sintomas.setOnClickListener {
             Navigation.findNavController(it).navigate(R.id.action_main_View_to_formularioFragment)
         }
         main_boton_contactTracing.setOnClickListener {
             Navigation.findNavController(it).navigate(R.id.action_main_View_to_settingsFragment)
         }
+        main_boton_SobreelApp.setOnClickListener {
+            Navigation.findNavController(it).navigate(R.id.sobreelAppFragment)
+        }
+        main_boton_Resultadospruebas.setOnClickListener {
+            Navigation.findNavController(it).navigate(R.id.resultadosPruebaFragment)
+        }
     }
+
+
 
 }

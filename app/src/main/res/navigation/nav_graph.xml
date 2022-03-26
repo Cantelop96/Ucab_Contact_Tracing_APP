@@ -21,7 +21,8 @@
             app:destination="@id/resultadosPruebaFragment" />
         <action
             android:id="@+id/action_main_View_to_sobreelAppFragment"
-            app:destination="@id/sobreelAppFragment" />
+            app:destination="@id/sobreelAppFragment"
+            app:popUpTo="@id/main_View" />
     </fragment>
     <fragment
         android:id="@+id/formularioFragment"
@@ -34,6 +35,9 @@
         <action
             android:id="@+id/action_formularioFragment_to_formularioSinSintomasFragment"
             app:destination="@id/formularioSinSintomasFragment" />
+        <action
+            android:id="@+id/action_formularioFragment_to_main_View"
+            app:destination="@id/main_View" />
     </fragment>
     <fragment
         android:id="@+id/formularioConSintomasFragment"
