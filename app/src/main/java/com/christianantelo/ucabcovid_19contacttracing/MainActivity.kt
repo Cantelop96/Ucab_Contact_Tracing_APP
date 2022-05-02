@@ -26,102 +26,13 @@ private const val ADVERTISE_MODE_BALANCED = 1
 
 class MainActivity : AppCompatActivity() {
 
-    private val scanResults = mutableListOf<ScanResult>()
-    private val scanDevice = mutableListOf<String>()
-    private val scanRSSI = mutableListOf<Int>()
-    private val scanTXPower = mutableListOf<Int>()
-    private var scanning = false
-    private val handler = Handler(Looper.getMainLooper())
-    private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg
-    private val My_UUID = UUID.fromString("9778965b-73f1-4003-953a-9432d3c6fb26")
+    fun getRandomList(random: Random): List<Long> =
+        List(300) { random.nextLong() }
 
     fun numberToByteArray(data: Number, size: Int = 4): ByteArray =
         ByteArray(size) { i -> (data.toLong() shr (i * 8)).toByte() }
 
     var serviceData = numberToByteArray(123456)
-
-    private val bleScanner by lazy {
-        bluetoothAdapter.bluetoothLeScanner
-    }
-    private val bleAdvertiser by lazy {
-        bluetoothAdapter.bluetoothLeAdvertiser
-    }
-
-    private val bluetoothAdapter: BluetoothAdapter by lazy {
-        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothManager.adapter
-    }
-
-    private val advertiseSettings =
-        AdvertiseSettings.Builder()
-            .setAdvertiseMode(1)
-            .setTxPowerLevel(1)
-            .build()
-
-    private val advertiseData = AdvertiseData.Builder()
-        .setIncludeTxPowerLevel(true)
-        .addServiceData(ParcelUuid(My_UUID), serviceData)
-        .build()
-
-    val filter = ScanFilter.Builder().setServiceUuid(
-        ParcelUuid(My_UUID)
-    ).build()
-
-    private val devfilters: MutableList<ScanFilter> = ArrayList()
-
-    private val scanSettings = ScanSettings.Builder()
-        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-        .build()
-
-    private val advertiseCallback = object : AdvertiseCallback() {
-        override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-            super.onStartSuccess(settingsInEffect)
-            if (settingsInEffect != null) {
-                Log.i(
-                    "AdverticeCallback",
-                    "Se esta enviando la info $advertiseSettings con tx ${advertiseSettings.txPowerLevel}"
-                )
-            } else {
-                Log.i(
-                    "AdverticeCallback",
-                    "Se esta enviando la info $advertiseData"
-                )
-            }
-        }
-
-        override fun onStartFailure(errorCode: Int) {
-            super.onStartFailure(errorCode)
-            Log.i(
-                "AdverticeCallback",
-                "Fallo con codigo: $errorCode"
-            )
-        }
-    }
-
-    private val scanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val rssi = result.rssi
-            val indexQuery = scanResults.indexOfFirst { it.device.address == result.device.address }
-            if (indexQuery != -1) { // A scan result already exists with the same address
-                scanResults[indexQuery] = result
-            } else {
-                with(result.device) {
-                    Log.i(
-                        "ScanCallback",
-                        "Found BLE device! Name: ${name ?: "Unnamed"}, address: $address, RSSI: $rssi"
-                    )
-                }
-                scanResults.add(result)
-                scanDevice.add(result.device.address)
-                scanRSSI.add(result.rssi)
-                scanTXPower.add(result.scanRecord!!.txPowerLevel)
-            }
-        }
-
-        override fun onScanFailed(errorCode: Int) {
-            Log.e("ScanCallback", "onScanFailed: code $errorCode")
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,6 +65,53 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // Permisos
+
+    val isLocationPermissionGranted
+        get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+
+    fun Context.hasPermission(permissionType: String): Boolean {
+        return ContextCompat.checkSelfPermission(this, permissionType) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun promptEnableBluetooth() {
+        if (!bluetoothAdapter.isEnabled) {
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
+        }
+    }
+    private fun requestLocationPermission() {
+        if (isLocationPermissionGranted) {
+            return
+        }
+        requestPermission(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            LOCATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
+                    requestLocationPermission()
+                } else {
+                    startBleScan()
+                }
+            }
+        }
+    }
+
+    private fun Activity.requestPermission(permission: String, requestCode: Int) {
+        ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == ENABLE_BLUETOOTH_REQUEST_CODE) {
@@ -174,9 +132,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getRandomList(random: Random): List<Long> =
-        List(300) { random.nextLong() }
-
     override fun onResume() {
         super.onResume()
         if (!bluetoothAdapter.isEnabled) {
@@ -184,20 +139,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun promptEnableBluetooth() {
-        if (!bluetoothAdapter.isEnabled) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
-        }
+    // Bluetooth Configuration
+
+    private val My_UUID = UUID.fromString("9778965b-73f1-4003-953a-9432d3c6fb26")
+    private val bleScanner by lazy {bluetoothAdapter.bluetoothLeScanner}
+    private val bleAdvertiser by lazy {bluetoothAdapter.bluetoothLeAdvertiser }
+    private val bluetoothAdapter: BluetoothAdapter by lazy {
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothManager.adapter
     }
 
-    val isLocationPermissionGranted
-        get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    // Bluetooth Advertiser
 
-    fun Context.hasPermission(permissionType: String): Boolean {
-        return ContextCompat.checkSelfPermission(this, permissionType) ==
-                PackageManager.PERMISSION_GRANTED
-    }
+    private val advertiseSettings =
+        AdvertiseSettings.Builder()
+            .setAdvertiseMode(1)
+            .setTxPowerLevel(1)
+            .build()
+
+    private val advertiseData = AdvertiseData.Builder()
+        .setIncludeTxPowerLevel(true)
+        .addServiceData(ParcelUuid(My_UUID), serviceData)
+        .build()
 
     private fun startAdvertising(
         settings: AdvertiseSettings,
@@ -206,6 +169,49 @@ class MainActivity : AppCompatActivity() {
     ) {
         bleAdvertiser.startAdvertising(settings, advertiseData, callback)
     }
+
+    private val advertiseCallback = object : AdvertiseCallback() {
+        override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
+            super.onStartSuccess(settingsInEffect)
+            if (settingsInEffect != null) {
+                Log.i(
+                    "AdverticeCallback",
+                    "Se esta enviando la info $advertiseSettings con tx ${advertiseSettings.txPowerLevel}"
+                )
+            } else {
+                Log.i(
+                    "AdverticeCallback",
+                    "Se esta enviando la info $advertiseData"
+                )
+            }
+        }
+
+        override fun onStartFailure(errorCode: Int) {
+            super.onStartFailure(errorCode)
+            Log.i(
+                "AdverticeCallback",
+                "Fallo con codigo: $errorCode"
+            )
+        }
+    }
+
+
+    // Bluetooth Scan
+
+    private val scanResults = mutableListOf<ScanResult>()
+    private val scanDevice = mutableListOf<String>()
+    private val scanRSSI = mutableListOf<Int>()
+    private val scanTXPower = mutableListOf<Int>()
+    private var scanning = false
+    private val handler = Handler(Looper.getMainLooper())
+    private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg
+    private val filter = ScanFilter.Builder()
+        .setServiceUuid(ParcelUuid(My_UUID))
+        .build()
+    private val devfilters: MutableList<ScanFilter> = ArrayList()
+    private val scanSettings = ScanSettings.Builder()
+        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        .build()
 
     private fun startBleScan() {
         devfilters.add(filter)
@@ -230,35 +236,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun requestLocationPermission() {
-        if (isLocationPermissionGranted) {
-            return
-        }
-        requestPermission(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            LOCATION_PERMISSION_REQUEST_CODE
-        )
-    }
-
-    private fun Activity.requestPermission(permission: String, requestCode: Int) {
-        ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            LOCATION_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
-                    requestLocationPermission()
-                } else {
-                    startBleScan()
+    private val scanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            val rssi = result.rssi
+            val indexQuery = scanResults.indexOfFirst { it.device.address == result.device.address }
+            if (indexQuery != -1) { // A scan result already exists with the same address
+                scanResults[indexQuery] = result
+            } else {
+                with(result.device) {
+                    Log.i(
+                        "ScanCallback",
+                        "Found BLE device! Name: ${name ?: "Unnamed"}, address: $address, RSSI: $rssi"
+                    )
                 }
+                scanResults.add(result)
+                scanDevice.add(result.device.address)
+                scanRSSI.add(result.rssi)
+                scanTXPower.add(result.scanRecord!!.txPowerLevel)
             }
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            Log.e("ScanCallback", "onScanFailed: code $errorCode")
         }
     }
 
