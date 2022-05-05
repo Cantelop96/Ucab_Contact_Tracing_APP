@@ -14,17 +14,34 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import com.christianantelo.ucabcovid_19contacttracing.constants.Constantes.ACTION_START_OR_RESUME_SERVICE
+import com.christianantelo.ucabcovid_19contacttracing.constants.Constantes.My_UUID
+import com.christianantelo.ucabcovid_19contacttracing.services.ContactTracingService
+import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDAO
 import com.google.android.play.core.internal.ad
+import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.random.nextLong
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val LOCATION_PERMISSION_REQUEST_CODE = 2
-private const val ADVERTISE_MODE_BALANCED = 1
+var contactDate = Date()
+
 
 class MainActivity : AppCompatActivity() {
+
+
+    private val scan = object : Runnable{
+        override fun run() {
+            startBleScan()
+            handler.postDelayed(this,150000)
+        }
+    }
 
     fun getRandomList(random: Random): List<Long> =
         List(300) { random.nextLong() }
@@ -32,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     fun numberToByteArray(data: Number, size: Int = 4): ByteArray =
         ByteArray(size) { i -> (data.toLong() shr (i * 8)).toByte() }
 
-    var serviceData = numberToByteArray(123456)
+    var serviceData = numberToByteArray(1321456789456)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,21 +66,25 @@ class MainActivity : AppCompatActivity() {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
         }
-        Log.i(
-            "AdverticeCallback",
-            "Antes de empezar"
-        )
         startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
-        Log.i(
-            "AdverticeCallback",
-            "Despues de la funcion"
-        )
-        startBleScan()
-        Log.i("Results", "Results: $scanResults")
-        Log.i("Results", "Results Device: $scanDevice")
-        Log.i("Results", "Results RSSI: $scanRSSI")
+        //sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
+
 
     }
+    override fun onResume() {
+        super.onResume()
+        if (!bluetoothAdapter.isEnabled) {
+            promptEnableBluetooth()
+        }
+        handler.post (scan)
+        Log.i("Results", "Results lista A: $Bluetooth_Devices_A Lista B: $Bluetooth_Devices_B")
+    }
+
+    private fun  sendCommandToService(action: String) =
+        Intent(this, ContactTracingService::class.java).also {
+            it.action = action
+            this.startService(it)
+        }
 
     // Permisos
 
@@ -81,6 +102,7 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
         }
     }
+
     private fun requestLocationPermission() {
         if (isLocationPermissionGranted) {
             return
@@ -132,18 +154,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (!bluetoothAdapter.isEnabled) {
-            promptEnableBluetooth()
-        }
-    }
-
     // Bluetooth Configuration
 
-    private val My_UUID = UUID.fromString("9778965b-73f1-4003-953a-9432d3c6fb26")
-    private val bleScanner by lazy {bluetoothAdapter.bluetoothLeScanner}
-    private val bleAdvertiser by lazy {bluetoothAdapter.bluetoothLeAdvertiser }
+    private val bleScanner by lazy { bluetoothAdapter.bluetoothLeScanner }
+    private val bleAdvertiser by lazy { bluetoothAdapter.bluetoothLeAdvertiser }
     private val bluetoothAdapter: BluetoothAdapter by lazy {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
@@ -199,16 +213,26 @@ class MainActivity : AppCompatActivity() {
     // Bluetooth Scan
 
     private val scanResults = mutableListOf<ScanResult>()
-    private val scanDevice = mutableListOf<String>()
-    private val scanRSSI = mutableListOf<Int>()
-    private val scanTXPower = mutableListOf<Int>()
+    private val Bluetooth_Devices = mutableListOf<BluetoothDevice>()
+    private var Bluetooth_Devices_A = mutableListOf<String>()
+    private var Bluetooth_Devices_B = mutableListOf<String>()
+    private var Bluetooth_Devices_C = mutableListOf<String>()
+    private var Bluetooth_Devices_D = mutableListOf<String>()
+    var current_list = "A"
+    var firstscan = true
     private var scanning = false
     private val handler = Handler(Looper.getMainLooper())
     private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg
+
+
     private val filter = ScanFilter.Builder()
         .setServiceUuid(ParcelUuid(My_UUID))
         .build()
+
+
     private val devfilters: MutableList<ScanFilter> = ArrayList()
+
+
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
@@ -218,18 +242,44 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isLocationPermissionGranted) {
             requestLocationPermission()
         } else {
-            bleScanner.startScan(devfilters, scanSettings, scanCallback)
+            bleScanner.startScan(null, scanSettings, scanCallback)
             if (!scanning) { // Stops scanning after a pre-defined scan period.
                 handler.postDelayed({
                     scanning = false
-                    Log.i("Device", "termino dentro del if")
+                    Log.i("Device", "termino el Scan")
                     bleScanner.stopScan(scanCallback)
+                    scanResults.clear()
+                    if (current_list == "A"){
+                        current_list = "B"
+                        if (!firstscan){
+                            Bluetooth_Devices_C = Bluetooth_Devices_A.filter{Bluetooth_Devices_B.contains(it)} as MutableList<String>
+                            Bluetooth_Devices_D.addAll( Bluetooth_Devices_C.filterNot {Bluetooth_Devices_D.contains(it)} as MutableList<String>)
+                            Log.i("Results", "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
+                            Bluetooth_Devices_B.clear()
+                        }
+                    }
+                    else{
+                        current_list = "A"
+                        if (firstscan){
+                            Bluetooth_Devices_D = Bluetooth_Devices_A.filter{Bluetooth_Devices_B.contains(it)} as MutableList<String>
+                            Bluetooth_Devices_C = Bluetooth_Devices_D
+                            firstscan = false
+                            Log.i("Results", "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
+                            Bluetooth_Devices_A.clear()
+                        }
+                        else{
+                            Bluetooth_Devices_C = Bluetooth_Devices_A.filter{Bluetooth_Devices_B.contains(it)} as MutableList<String>
+                            Bluetooth_Devices_D.addAll( Bluetooth_Devices_C.filterNot {Bluetooth_Devices_D.contains(it)} as MutableList<String>)
+                            Log.i("Results", "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
+                            Bluetooth_Devices_A.clear()
+                        }
+                    }
+
                 }, SCAN_PERIOD)
                 scanning = true
-                Log.i("Device", "empezo el Scann")
-                bleScanner.startScan(devfilters, scanSettings, scanCallback)
+                Log.i("Device", "empezo el Scan")
+                bleScanner.startScan(null, scanSettings, scanCallback)
             } else {
-                Log.i("Device", "en el else")
                 scanning = false
                 bleScanner.stopScan(scanCallback)
             }
@@ -242,7 +292,8 @@ class MainActivity : AppCompatActivity() {
             val indexQuery = scanResults.indexOfFirst { it.device.address == result.device.address }
             if (indexQuery != -1) { // A scan result already exists with the same address
                 scanResults[indexQuery] = result
-            } else {
+            }
+            else {
                 with(result.device) {
                     Log.i(
                         "ScanCallback",
@@ -250,9 +301,23 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
                 scanResults.add(result)
-                scanDevice.add(result.device.address)
-                scanRSSI.add(result.rssi)
-                scanTXPower.add(result.scanRecord!!.txPowerLevel)
+                if (current_list == "A"){
+                    Bluetooth_Devices_A.add(result.device.address)
+
+                }
+                else{
+                    Bluetooth_Devices_B.add(result.device.address)
+                }
+
+//                Bluetooth_Devices.add(
+//                    Bluetooth_Device(
+//                        result.device.address,
+//                        result.rssi,
+//                        result.scanRecord!!.txPowerLevel,
+//                        result.scanRecord!!.getServiceData(ParcelUuid(My_UUID))!!,
+//                        contactDate
+//                    )
+//                )
             }
         }
 
