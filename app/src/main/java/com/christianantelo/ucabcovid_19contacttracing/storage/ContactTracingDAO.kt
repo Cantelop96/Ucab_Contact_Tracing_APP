@@ -13,7 +13,7 @@ interface ContactTracingDAO {
     suspend fun insertContact(contactTracing: ContactTracing)
 
     @Delete
-    suspend fun deleteContact(contactTracing: ContactTracing)
+    fun deleteContact(contactTracing: ContactTracing)
 
     @Query("SELECT * FROM table_of_contacts ORDER BY contactDate DESC")
     fun getAllContactSortByDate(): LiveData<List<ContactTracing>>

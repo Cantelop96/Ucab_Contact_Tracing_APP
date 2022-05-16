@@ -7,20 +7,19 @@ import java.util.*
 import kotlin.math.pow
 
 val base = 10
-
+//Todo(Cuando se tenga otro dispocitivo probar con propiedades comentadas)
 @Entity(tableName = "table_of_contacts")
 data class ContactTracing(
+    @PrimaryKey
     var address: String,
     var RSSI: Int,
-    var txPowerLevel: Int,
-    var serviceData: ByteArray,
+    //var txPowerLevel: Int,
+    //var serviceData: ByteArray,
     var contactDate: Long
 ) {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = null
-    var decodedServiceData = read4BytesFromBuffer(serviceData)
-    var exponent = (RSSI - txPowerLevel) / -10 * 2
-    var distance = base.toDouble().pow(exponent.toDouble())
+    //var decodedServiceData = read4BytesFromBuffer(serviceData)
+    //var exponent = (RSSI - txPowerLevel) / -10 * 2
+    //var distance = base.toDouble().pow(exponent.toDouble())
 
 
 

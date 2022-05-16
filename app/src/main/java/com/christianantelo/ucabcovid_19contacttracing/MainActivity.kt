@@ -3,7 +3,6 @@ package com.christianantelo.ucabcovid_19contacttracing
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
 import android.content.Context
@@ -15,12 +14,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.My_UUID
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
 import com.christianantelo.ucabcovid_19contacttracing.Servicios.ContactTracingService
-import com.google.android.play.core.internal.ad
+import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.random.Random
-import kotlin.random.nextLong
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val LOCATION_PERMISSION_REQUEST_CODE = 2
@@ -28,19 +29,23 @@ private const val ADVERTISE_MODE_BALANCED = 1
 
 class MainActivity : AppCompatActivity() {
 
+    val dateTime: Date = Calendar.getInstance().time
 
+    val contactDate: Long = dateTime.time
+
+    private val db by lazy { ContactTracingDatabase.invoke(this).getContactTracingDao()}
 
     private val scan = object : Runnable{
         override fun run() {
             startBleScan()
-            handler.postDelayed(this,150000)
+            handler.postDelayed(this,60000) //Todo(Devolver valor a 150000 cuando termine el test)
         }
     }
 
     fun getRandomList(random: Random): List<Long> =
         List(300) { random.nextLong() }
 
-    fun numberToByteArray(data: Number, size: Int = 4): ByteArray =
+    private fun numberToByteArray(data: Number, size: Int = 4): ByteArray =
         ByteArray(size) { i -> (data.toLong() shr (i * 8)).toByte() }
 
     var serviceData = numberToByteArray(1321456789456)
@@ -207,7 +212,7 @@ class MainActivity : AppCompatActivity() {
     // Bluetooth Scan
 
     private val scanResults = mutableListOf<ScanResult>()
-    private val Bluetooth_Devices = mutableListOf<BluetoothDevice>()
+    private val Bluetooth_Devices = mutableListOf<ContactTracing>()
     private var Bluetooth_Devices_A = mutableListOf<String>()
     private var Bluetooth_Devices_B = mutableListOf<String>()
     private var Bluetooth_Devices_C = mutableListOf<String>()
@@ -255,7 +260,7 @@ class MainActivity : AppCompatActivity() {
                     else{
                         current_list = "A"
                         if (firstscan){
-                            Bluetooth_Devices_D = Bluetooth_Devices_A.filter{Bluetooth_Devices_B.contains(it)} as MutableList<String>
+                            Bluetooth_Devices_D = Bluetooth_Devices_A.filter{(Bluetooth_Devices_B).contains(it)} as MutableList<String>
                             Bluetooth_Devices_C = Bluetooth_Devices_D
                             firstscan = false
                             Log.i("Results", "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
@@ -267,6 +272,15 @@ class MainActivity : AppCompatActivity() {
                             Log.i("Results", "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
                             Bluetooth_Devices_A.clear()
                         }
+
+                    }
+                    for(Device in Bluetooth_Devices){
+                        if(Bluetooth_Devices_D.contains(Device.address)){
+                            insertContact(Device)
+                            Log.i("DB", "Añade $Device a la DB")
+
+                        }
+                        Log.i("DB", "Deentro del For fuera de if")
                     }
 
                 }, SCAN_PERIOD)
@@ -295,23 +309,23 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
                 scanResults.add(result)
+
                 if (current_list == "A"){
-                    Bluetooth_Devices_A.add(result.device.address)
+                    Bluetooth_Devices_A.add(
+                        result.device.address)
 
                 }
                 else{
-                    Bluetooth_Devices_B.add(result.device.address)
+                    Bluetooth_Devices_B.add(
+                        result.device.address)
                 }
-
-//                Bluetooth_Devices.add(
-//                    Bluetooth_Device(
-//                        result.device.address,
-//                        result.rssi,
-//                        result.scanRecord!!.txPowerLevel,
-//                        result.scanRecord!!.getServiceData(ParcelUuid(My_UUID))!!,
-//                        contactDate
-//                    )
-//                )
+                Bluetooth_Devices.add(
+                    ContactTracing(
+                        result.device.address,
+                        result.rssi,
+                        contactDate
+                    )
+                )
             }
         }
 
@@ -319,6 +333,25 @@ class MainActivity : AppCompatActivity() {
             Log.e("ScanCallback", "onScanFailed: code $errorCode")
         }
     }
+
+    // Database fun
+
+    fun insertContact(contactTracing: ContactTracing) =
+        lifecycleScope.launch {
+            db.insertContact(contactTracing)
+        }
+
+
+    fun  deleteContact(contactTracing: ContactTracing) =
+        db.deleteContact(contactTracing)
+
+    fun getCloseContacts() = db.getAllContactSortByDate()
+
+    fun deleteOldContacts() = db.borrarContactsMasde14Dias()
+
+    fun deleteAllInfo() = db.clear()
+
+
 
 }
 
