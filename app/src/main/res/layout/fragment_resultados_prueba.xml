@@ -32,29 +32,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
-                android:text="La informacion que se introduzca en esta seccion es confidencial. \n\nEsta informacion es de un caracter sencible por esto usted se compromete a que la informacion que se introduzca en esta seccion es verdadera.\n\n "
-                android:textSize="20dp" />
+                android:text="@string/Compromiso_de_veracidad_resultado_de_prueba"
+                android:textSize="20dp"
+                android:justificationMode="inter_word"/>
 
             <RadioGroup
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:orientation="horizontal"
+                android:gravity="center">
                     <RadioButton
                         android:id="@+id/rb_resultado_negativo"
-                        android:layout_width="163dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="Negativo" />
 
                     <RadioButton
                         android:id="@+id/rb_resultado_positivo"
-                        android:layout_width="163dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="Positivo" />
-                </LinearLayout>
             </RadioGroup>
 
             <LinearLayout

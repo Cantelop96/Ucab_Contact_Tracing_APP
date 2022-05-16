@@ -1,9 +1,8 @@
-package com.christianantelo.ucabcovid_19contacttracing.storage
+package com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import com.christianantelo.ucabcovid_19contacttracing.MainActivity
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.core.PkSave

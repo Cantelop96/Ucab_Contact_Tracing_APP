@@ -25,13 +25,15 @@
                 android:layout_height="wrap_content"
                 android:text="Sobre la aplicacion"
                 android:textSize="30dp"
-                android:layout_marginVertical="10dp"/>
+                android:layout_marginVertical="10dp"
+                android:justificationMode="inter_word"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20dp"
                 android:layout_marginVertical="10dp"
-                android:text="Este es un prototipo de aplicacion desarrollado para el seguimiento de contactos cercanos de COVID-19. \n\n Funciona haciendo uso de Bluetooth Low Energy el cual utiliza un sistema de la intencidad de la señal para identificar la distancia entre dispocitivos "/>
+                android:text="@string/Sobre_el_App_Texto"
+                android:justificationMode="inter_word"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

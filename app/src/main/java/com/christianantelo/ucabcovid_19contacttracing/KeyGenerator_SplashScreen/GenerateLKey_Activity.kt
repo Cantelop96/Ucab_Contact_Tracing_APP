@@ -1,4 +1,4 @@
-package com.christianantelo.ucabcovid_19contacttracing.storage
+package com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +20,10 @@ class GenerateLKey_Activity : AppCompatActivity() {
         val pair = generator.generateKeyPair()
         val privateKey = pair.private
         val publicKey = pair.public
-        val random = Random(1239984)
+        val random = Random(124)
+        fun getRandomList(random: Random): List<Long> =
+            List(300) { random.nextLong() }
+        val keyList = getRandomList(random)
         Log.e("Error", random.toString())
 
 /*        val outputStream = FileOutputStream("generated_privkey.pem")

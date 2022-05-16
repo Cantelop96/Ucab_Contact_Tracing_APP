@@ -65,6 +65,9 @@
         <action
             android:id="@+id/action_settingsFragment2_to_main_View"
             app:destination="@id/main_View" />
+        <action
+            android:id="@+id/action_settingsFragment2_to_borrarTodoConfirmationFragment2"
+            app:destination="@id/borrarTodoConfirmationFragment2" />
     </fragment>
     <fragment
         android:id="@+id/resultadosPruebaFragment"
@@ -96,4 +99,8 @@
             android:id="@+id/action_sobreelAppFragment_to_main_View"
             app:destination="@id/main_View" />
     </fragment>
+    <fragment
+        android:id="@+id/borrarTodoConfirmationFragment2"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.BorrarTodoConfirmationFragment"
+        android:label="BorrarTodoConfirmationFragment" />
 </navigation>
