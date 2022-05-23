@@ -1,18 +1,25 @@
 package com.christianantelo.ucabcovid_19contacttracing.Fragments
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
+import com.christianantelo.ucabcovid_19contacttracing.MainActivity
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
 import kotlinx.android.synthetic.main.fragment_borrar_todo_confirmation.*
+import kotlin.system.exitProcess
 
 class BorrarTodoConfirmationFragment : Fragment() {
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,10 +39,10 @@ class BorrarTodoConfirmationFragment : Fragment() {
             }
         })
         btn_delete_all_info_confirmado.setOnClickListener {
-            deleteAllInfo()
+            pref.deleteall()
+            (activity as MainActivity).deleteAllInfo()
+            (activity as MainActivity).finish()
         }
     }
 
-    private val db by lazy { ContactTracingDatabase.invoke(this).getContactTracingDao()}
-    fun deleteAllInfo() = db.clear()
 }

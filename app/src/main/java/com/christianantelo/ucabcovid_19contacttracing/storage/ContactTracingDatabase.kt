@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
-import com.christianantelo.ucabcovid_19contacttracing.Fragments.BorrarTodoConfirmationFragment
+
 
 
 @Database(
@@ -21,9 +21,10 @@ abstract class ContactTracingDatabase : RoomDatabase() {
         private  var instance: ContactTracingDatabase? = null
         private val LOCK = Any()
 
-        operator fun invoke(context: BorrarTodoConfirmationFragment) = instance ?: synchronized(LOCK){
-            instance ?: createDatabase(context).also{ instance = it}
+        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
+            instance ?: createDatabase(context).also { instance = it }
         }
+
         private fun createDatabase(context: Context) =
             Room.databaseBuilder(
                 context.applicationContext,

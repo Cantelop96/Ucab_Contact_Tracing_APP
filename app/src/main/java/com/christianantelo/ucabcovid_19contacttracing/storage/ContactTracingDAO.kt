@@ -16,7 +16,7 @@ interface ContactTracingDAO {
     fun deleteContact(contactTracing: ContactTracing)
 
     @Query("SELECT * FROM table_of_contacts ORDER BY contactDate DESC")
-    fun getAllContactSortByDate(): LiveData<List<ContactTracing>>
+    fun getAllContactSortByDate(): MutableList<ContactTracing>
 
     @Query("DELETE FROM table_of_contacts WHERE (julianday('now') - julianday(contactDate))>14")
     fun borrarContactsMasde14Dias()

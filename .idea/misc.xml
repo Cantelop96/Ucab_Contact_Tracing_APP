@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/layout/activity_first_time_key_gen.xml" value="0.24583333333333332" />
+        <entry key="app/src/main/res/layout/activity_generate_lkey.xml" value="0.12760416666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.125" />
         <entry key="app/src/main/res/layout/activity_splash_screen.xml" value="0.24583333333333332" />
+        <entry key="app/src/main/res/layout/activity_storage.xml" value="0.12447916666666667" />
         <entry key="app/src/main/res/layout/fragment_borrar_todo_confirmation.xml" value="0.24583333333333332" />
         <entry key="app/src/main/res/layout/fragment_formulario.xml" value="0.2028985507246377" />
         <entry key="app/src/main/res/layout/fragment_formulario_con_sintomas.xml" value="0.11955420466058764" />
@@ -17,7 +20,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
