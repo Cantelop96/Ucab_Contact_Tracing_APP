@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
         }
-
+        bluetoothActivado.postValue(true)
         //startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
         sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
 

@@ -11,8 +11,8 @@ import androidx.navigation.Navigation
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
-import com.christianantelo.ucabcovid_19contacttracing.MainActivity
 import com.christianantelo.ucabcovid_19contacttracing.R
+import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 import kotlinx.android.synthetic.main.fragment_formulario_sin_sintomas.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 

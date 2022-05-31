@@ -5,8 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
-import com.christianantelo.ucabcovid_19contacttracing.MainActivity
 import com.christianantelo.ucabcovid_19contacttracing.R
+import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_first_time_key_gen.*
 import java.security.KeyPairGenerator
 
