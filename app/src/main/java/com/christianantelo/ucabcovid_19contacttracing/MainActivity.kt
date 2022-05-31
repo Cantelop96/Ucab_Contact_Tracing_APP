@@ -4,8 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
 import android.content.Context
@@ -20,17 +20,21 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_NOTIFICACION_INFECCION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.My_UUID
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
 import com.christianantelo.ucabcovid_19contacttracing.Servicios.ContactTracingService
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
-import com.christianantelo.ucabcovid_19contacttracing.storage.StorageActivity
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import kotlin.random.Random
 
@@ -47,11 +51,12 @@ class MainActivity : AppCompatActivity() {
         List(300) { random.nextInt() }
 
     val keyList = getRandomList(random)
-    val currentKey = keyList.random()
+    var currentKey = keyList.random()
 
     // Initialize Room Database
     val db by lazy { ContactTracingDatabase.invoke(this).getContactTracingDao() }
     val fsdb = Firebase.firestore
+    lateinit var contactosCercanos: MutableList<ContactTracing>
 
     //Funcion que inicia un nuevo scan cas 2,5 min
     private val scan = object : Runnable {
@@ -64,11 +69,11 @@ class MainActivity : AppCompatActivity() {
     // Cambia la Key del service data cada hora
     private val changeKey = object : Runnable {
         override fun run() {
-            bleAdvertiser.stopAdvertising(advertiseCallback)
-
-            val currentKey = keyList.random()
-            startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
             handler.postDelayed(this, 120000) //Todo(Cambiar a 3600000 cuando terminen las pruebas)
+            bleAdvertiser.stopAdvertising(advertiseCallback)
+            //infectionCheck()
+            currentKey = keyList.random()
+            startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
         }
     }
 
@@ -84,9 +89,17 @@ class MainActivity : AppCompatActivity() {
                 (buffer[offset + 0].toInt() and 0xff)
     }
 
+    //Detiene todas las funciones del Contact Tracing
+    internal fun stopContactTracing() {
+        bleAdvertiser.stopAdvertising(advertiseCallback)
+        bleScanner.stopScan(scanCallback)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        navigateToNotificaciondeInfeccion(intent)
 
         if (bluetoothAdapter == null) {
             Toast.makeText(
@@ -96,35 +109,39 @@ class MainActivity : AppCompatActivity() {
             ).show()
             return
         }
-        if (bluetoothAdapter?.isEnabled == false) {
+        if (bluetoothAdapter.isEnabled == false) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(notificationManager)
-        }
+
         startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
         //sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
 
-
     }
+
     override fun onResume() {
         super.onResume()
         if (!bluetoothAdapter.isEnabled) {
             promptEnableBluetooth()
         }
-        handler.post (scan)
-        Log.i("Results", "Results lista A: $Bluetooth_Devices_A Lista B: $Bluetooth_Devices_B")
+        if (pref.getContactTracingState()) {
+            handler.post(scan)
+            handler.post(changeKey)
+        }
     }
 
-    private fun  sendCommandToService(action: String) =
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        navigateToNotificaciondeInfeccion(intent)
+    }
+
+    private fun sendCommandToService(action: String) =
         Intent(this, ContactTracingService::class.java).also {
             it.action = action
             this.startService(it)
         }
 
     // Permisos
-
     val isLocationPermissionGranted
         get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -153,7 +170,7 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -175,7 +192,7 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == ENABLE_BLUETOOTH_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                if (bluetoothAdapter!!.isEnabled) {
+                if (bluetoothAdapter.isEnabled) {
                     Toast.makeText(this, "Se a activado el Bluetooth.", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "No se ha activado el Bluetooth", Toast.LENGTH_SHORT)
@@ -192,7 +209,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Bluetooth Configuration
-
     private val bleScanner by lazy { bluetoothAdapter.bluetoothLeScanner }
     private val bleAdvertiser by lazy { bluetoothAdapter.bluetoothLeAdvertiser }
     private val bluetoothAdapter: BluetoothAdapter by lazy {
@@ -201,7 +217,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Bluetooth Advertiser
-
     private val advertiseSettings =
         AdvertiseSettings.Builder()
             .setAdvertiseMode(1)
@@ -216,10 +231,11 @@ class MainActivity : AppCompatActivity() {
     private fun startAdvertising(
         settings: AdvertiseSettings,
         advertiseData: AdvertiseData,
-        callback: AdvertiseCallback
+        callback: AdvertiseCallback,
     ) {
         bleAdvertiser.startAdvertising(settings, advertiseData, callback)
     }
+
 
     private val advertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
@@ -246,9 +262,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     // Bluetooth Scan
-
     private val scanResults = mutableListOf<ScanResult>()
     private val Bluetooth_Devices = mutableListOf<ContactTracing>()
     private var Bluetooth_Devices_A = mutableListOf<Int>()
@@ -260,16 +274,10 @@ class MainActivity : AppCompatActivity() {
     private var scanning = false
     private val handler = Handler(Looper.getMainLooper())
     private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg
-
-
     private val filter = ScanFilter.Builder()
         .setServiceUuid(ParcelUuid(My_UUID))
         .build()
-
-
     private val devfilters: MutableList<ScanFilter> = ArrayList()
-
-
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
@@ -286,7 +294,7 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Device", "termino el Scan")
                     bleScanner.stopScan(scanCallback)
                     scanResults.clear()
-                    if (current_list == "A"){
+                    if (current_list == "A") {
                         current_list = "B"
                         if (!firstscan) {
                             Bluetooth_Devices_C =
@@ -298,25 +306,20 @@ class MainActivity : AppCompatActivity() {
                                 "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
                             Bluetooth_Devices_B.clear()
                         }
-                    }
-                    else{
+                    } else {
                         current_list = "A"
-                        if (firstscan){
+                        if (firstscan) {
                             Bluetooth_Devices_D =
                                 Bluetooth_Devices_A.filter { (Bluetooth_Devices_B).contains(it) } as MutableList<Int>
                             Bluetooth_Devices_C = Bluetooth_Devices_D
                             firstscan = false
-                            Log.i("Results", "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
                             Bluetooth_Devices_A.clear()
-                        }
-                        else {
+                        } else {
                             Bluetooth_Devices_C =
                                 Bluetooth_Devices_A.filter { Bluetooth_Devices_B.contains(it) } as MutableList<Int>
                             Bluetooth_Devices_D.addAll(Bluetooth_Devices_C.filterNot {
                                 Bluetooth_Devices_D.contains(it)
                             } as MutableList<Int>)
-                            Log.i("Results",
-                                "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
                             Bluetooth_Devices_A.clear()
                         }
 
@@ -339,8 +342,7 @@ class MainActivity : AppCompatActivity() {
             val indexQuery = scanResults.indexOfFirst { it.device.address == result.device.address }
             if (indexQuery != -1) { // A scan result already exists with the same address
                 scanResults[indexQuery] = result
-            }
-            else {
+            } else {
                 with(result.device) {
                     Log.i(
                         "ScanCallback",
@@ -378,27 +380,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Database fun
-
     private fun insertContact(contactTracing: ContactTracing) =
         lifecycleScope.launch {
-            db.insertContact(contactTracing)
+            with(Dispatchers.IO) { db.insertContact(contactTracing) }
         }
 
+    private fun deleteOldContacts() =
+        lifecycleScope.launch {
+            with(Dispatchers.IO) { db.borrarContactsMasde14Dias() }
+        }
 
-    fun deleteContact(contactTracing: ContactTracing) =
-        db.deleteContact(contactTracing)
+    private fun getCloseContacts() =
+        lifecycleScope.launch {
+            contactosCercanos = with(Dispatchers.IO) { db.getAllContactSortByDate() }
+        }
 
-    fun getCloseContacts() = db.getAllContactSortByDate()
+    internal fun deleteAllInfo() =
+        lifecycleScope.launch {
+            with(Dispatchers.IO) { db.clear() }
+        }
 
-    fun deleteOldContacts() = db.borrarContactsMasde14Dias()
-
-    internal fun deleteAllInfo() = db.clear()
-
-    fun agregarContactoALaBasedeDatos() {
-        for (Device in Bluetooth_Devices) { //todo(agregar limitante de distancia)
-            if (Bluetooth_Devices_D.contains(Device.decodedServiceData)) {
-                insertContact(Device)
-                Log.i("DB", "Añade $Device a la DB")
+    private fun agregarContactoALaBasedeDatos() {
+        for (Device in Bluetooth_Devices) {
+            if (Device.distance < 2) {
+                if (Bluetooth_Devices_D.contains(Device.decodedServiceData)) {
+                    insertContact(Device)
+                    Log.i("DB", "Añade $Device a la DB")
+                }
             }
         }
         Bluetooth_Devices.clear()
@@ -406,12 +414,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Revisar si se ha tenido contacto con alguninfectado
-
     lateinit var publicKeyInfectadosCompleta: MutableList<Int>
-
     fun infectionCheck() {
-        deleteOldContacts()
-        var contactosCercanos = getCloseContacts()
+        runBlocking {
+            deleteOldContacts().join()
+            Log.i("Corutinas", "Dentro de la primera")
+        }
+        runBlocking {
+            getCloseContacts().join()
+            Log.i("Corutinas", "Dentro de la segunda")
+        }
+        getCloseContacts()
         fsdb.collection("Infectados")
             .get()
             .addOnSuccessListener { result ->
@@ -434,14 +447,40 @@ class MainActivity : AppCompatActivity() {
                 publicKeyInfectadosCompleta.clear()
             }
         }
-
-
     }
 
     //Configuracion Notificacion Infeccion
+    fun sendNotificatioInfeccion() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
+                as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(notificationManager)
+        }
+        val notificationBuilder =
+            NotificationCompat.Builder(this, Constantes.NOTIFICATION_CHANNEL_ID)
+                .setAutoCancel(false)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentText("UCAB Contact Tracing")
+                .setContentText("Uno persona con la que estuvo en contacto resulto positivo para COVID-19")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(getMainActivityPendingIntent())
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+    }
 
-    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
-            as NotificationManager
+    fun getMainActivityPendingIntent() = PendingIntent.getActivity(
+        this,
+        0,
+        Intent(this, MainActivity::class.java).also {
+            it.action = ACTION_NOTIFICACION_INFECCION
+        },
+        0
+    )
+
+    fun navigateToNotificaciondeInfeccion(intent: Intent?) {
+        if (intent?.action == ACTION_NOTIFICACION_INFECCION) {
+            Nav_Host.findNavController().navigate(R.id.action_notificacion_to_reprte_infeccion)
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(notificationManager: NotificationManager) {
@@ -452,21 +491,6 @@ class MainActivity : AppCompatActivity() {
                 NotificationManager.IMPORTANCE_HIGH
             )
         notificationManager.createNotificationChannel(channel)
-    }
-
-    private fun sendNotificatioInfeccion() {
-        val notificationBuilder =
-            NotificationCompat.Builder(this, Constantes.NOTIFICATION_CHANNEL_ID)
-                .setAutoCancel(false)
-                .setOngoing(true)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentText("UCAB Contact Tracing")
-                .setContentText("Uno de sus contactos cercanos resulto positivo para COVID-19")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
-
-
     }
 
 

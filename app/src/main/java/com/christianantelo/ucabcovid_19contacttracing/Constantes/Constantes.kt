@@ -13,6 +13,7 @@ object Constantes {
     const val NOTIFICATION_CHANNEL_ID = "contactTracing_channel"
     const val NOTIFICATION_CHANNEL_NAME = "Contact Tracing"
     const val NOTIFICATION_ID = 1
+    const val ACTION_NOTIFICACION_INFECCION = "ACTION_NOTIFICACION_INFECCION"
 
     const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
     const val LOCATION_PERMISSION_REQUEST_CODE = 2

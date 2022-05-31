@@ -20,8 +20,6 @@ data class ContactTracing(
     var decodedServiceData = read4BytesFromBuffer(serviceData)
     var exponent = (RSSI - txPowerLevel) / -10 * 2
     var distance = base.toDouble().pow(exponent.toDouble())
-    //Todo(Cuando se tenga otro dispocitivo probar con propiedades comentadas)
-
 
     fun read4BytesFromBuffer(buffer: ByteArray, offset: Int = 0): Int {
         return (buffer[offset + 3].toInt() shl 24) or

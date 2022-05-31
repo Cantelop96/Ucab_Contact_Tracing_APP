@@ -9,12 +9,20 @@ class Preferencias(val context: Context) {
         storage.edit().putLong("privKey", privateKey).apply()
     }
 
+    fun saveContactTracingState(Active: Boolean) {
+        storage.edit().putBoolean("contactTracingState", Active).apply()
+    }
+
     fun saveFirstTime(firstTime: Boolean) {
         storage.edit().putBoolean("firstTime", firstTime).apply()
     }
 
     fun getKey(): Long {
         return storage.getLong("privKey", "0".toLong())!!
+    }
+
+    fun getContactTracingState(): Boolean {
+        return storage.getBoolean("contactTracingState", true)
     }
 
     fun getFirstTime(): Boolean {
