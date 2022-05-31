@@ -11,8 +11,8 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Preferencias
-import com.christianantelo.ucabcovid_19contacttracing.MainActivity
 import com.christianantelo.ucabcovid_19contacttracing.R
+import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.fragment_resultado_prueba_positivo.*

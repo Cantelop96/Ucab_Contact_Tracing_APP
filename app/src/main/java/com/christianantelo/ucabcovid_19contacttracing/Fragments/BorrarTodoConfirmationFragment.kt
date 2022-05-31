@@ -13,9 +13,9 @@ import androidx.core.content.edit
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
-import com.christianantelo.ucabcovid_19contacttracing.MainActivity
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
+import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 import kotlinx.android.synthetic.main.fragment_borrar_todo_confirmation.*
 import kotlin.system.exitProcess
 
@@ -40,6 +40,7 @@ class BorrarTodoConfirmationFragment : Fragment() {
         })
         btn_delete_all_info_confirmado.setOnClickListener {
             pref.deleteall()
+            (activity as MainActivity).stopContactTracing()
             (activity as MainActivity).deleteAllInfo()
             (activity as MainActivity).finish()
         }

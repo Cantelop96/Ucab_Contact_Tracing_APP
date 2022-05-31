@@ -52,6 +52,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    //ViewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+
     // Support libraries
     implementation "androidx.appcompat:appcompat:1.2.0"
     implementation "androidx.fragment:fragment:1.2.5"

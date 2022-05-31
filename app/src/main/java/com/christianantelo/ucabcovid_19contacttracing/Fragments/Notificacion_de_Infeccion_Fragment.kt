@@ -5,8 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.christianantelo.ucabcovid_19contacttracing.MainActivity
 import com.christianantelo.ucabcovid_19contacttracing.R
+import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 import kotlinx.android.synthetic.main.fragment_notificacion_de__infeccion.*
 
 
