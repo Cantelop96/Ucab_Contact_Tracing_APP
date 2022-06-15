@@ -29,6 +29,13 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        sw_seguimiento_activado.isChecked = pref.getContactTracingState()
+        if (sw_seguimiento_activado.isChecked) {
+            sw_seguimiento_activado.text = "El Seguimiento de contactos cercanos esta Activado"
+        } else {
+            sw_seguimiento_activado.text = "El Seguimiento de contactos cercanos esta Desactivado"
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -40,22 +47,24 @@ class SettingsFragment : Fragment() {
             Navigation.findNavController(it)
                 .navigate(R.id.action_settingsFragment2_to_borrarTodoConfirmationFragment2)
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
-        if (sw_seguimiento_activado.isChecked) {
-            if (!pref.getContactTracingState()) {
-                sw_seguimiento_activado.text = "El Seguimiento de contactos cercanos esta Activado"
-                pref.saveContactTracingState(true)
-                Log.i("Settings", "Se activo el seguimiento contacto cercano")
+        sw_seguimiento_activado.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                if (!pref.getContactTracingState()) {
+                    sw_seguimiento_activado.text =
+                        "El Seguimiento de contactos cercanos esta Activado"
+                    pref.saveContactTracingState(true)
+                    Log.i("Settings", "Se activo el seguimiento contacto cercano")
+                    (activity as MainActivity).startContactTracing()
+                }
+            } else {
+                sw_seguimiento_activado.text =
+                    "El Seguimiento de contactos cercanos esta Desactivado"
+                pref.saveContactTracingState(false)
+                (activity as MainActivity).stopContactTracing()
+                Log.i("Settings", "Se desactivo el seguimiento contacto cercano")
+
             }
-        } else {
-            sw_seguimiento_activado.text = "El Seguimiento de contactos cercanos esta Desactivado"
-            pref.saveContactTracingState(false)
-            (activity as MainActivity).stopContactTracing()
-            Log.i("Settings", "Se desactivo el seguimiento contacto cercano")
-
         }
     }
 }

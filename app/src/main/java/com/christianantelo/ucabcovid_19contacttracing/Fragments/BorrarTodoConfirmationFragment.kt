@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
@@ -39,6 +40,8 @@ class BorrarTodoConfirmationFragment : Fragment() {
             }
         })
         btn_delete_all_info_confirmado.setOnClickListener {
+            pref.saveFirstTime(true)
+            pref.saveKey(0)
             pref.deleteall()
             (activity as MainActivity).stopContactTracing()
             (activity as MainActivity).deleteAllInfo()

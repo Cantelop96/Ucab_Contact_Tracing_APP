@@ -13,10 +13,10 @@
         <entry key="app/src/main/res/layout/fragment_formulario_con_sintomas.xml" value="0.11955420466058764" />
         <entry key="app/src/main/res/layout/fragment_formulario_sin_sintomas.xml" value="0.11955420466058764" />
         <entry key="app/src/main/res/layout/fragment_main__view.xml" value="0.21829710144927536" />
-        <entry key="app/src/main/res/layout/fragment_resultado_prueba_positivo.xml" value="0.14427083333333332" />
+        <entry key="app/src/main/res/layout/fragment_resultado_prueba_positivo.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_resultados_prueba.xml" value="0.11955420466058764" />
-        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.11730072463768115" />
-        <entry key="app/src/main/res/layout/fragment_sobreel_app.xml" value="0.14427083333333332" />
+        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_sobreel_app.xml" value="0.25" />
       </map>
     </option>
   </component>

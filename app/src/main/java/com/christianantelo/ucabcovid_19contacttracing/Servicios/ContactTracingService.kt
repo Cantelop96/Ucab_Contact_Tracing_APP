@@ -5,26 +5,32 @@ import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_LOW
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
-import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
 import android.content.Context
 import android.content.Intent
-import android.os.*
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes
-import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_PAUSE_SERVICE
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_START_OR_RESUME_SERVICE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_STOP_CONTACT_TRACING_SERVIVE
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.My_UUID
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_CHANNEL_ID_NOTIFICACION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_CHANNEL_ID_SERVICIO
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_CHANNEL_NAME_NOTIFICACION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_CHANNEL_NAME_SERVICIO
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_SERVICIO
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
@@ -36,14 +42,12 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.*
 import kotlin.random.Random
 
+var isFirstStart = true
 
 class ContactTracingService : LifecycleService() {
-
-    var isFirstStart = true
 
     //Key List Generator
     private val privateKey = Application.pref.getKey()
@@ -57,7 +61,7 @@ class ContactTracingService : LifecycleService() {
     //Inicializamos las bases de datos
     val db by lazy { ContactTracingDatabase.invoke(this).getContactTracingDao() }
     val fsdb = Firebase.firestore
-    lateinit var contactosCercanos: MutableList<ContactTracing>
+    var contactosCercanos: MutableList<ContactTracing> = mutableListOf()
 
     companion object {
         val isInfected = MutableLiveData<Boolean>()
@@ -67,34 +71,60 @@ class ContactTracingService : LifecycleService() {
         isInfected.postValue(false)
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        initialValues()
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
             when (it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
                     if (isFirstStart) {
-                        startForegroundService()
+                        handler.postDelayed({
+                            startForegroundService()
+                        }, 1000)
                         isFirstStart = false
                     }
                 }
-                ACTION_PAUSE_SERVICE -> {
-                }
                 ACTION_STOP_CONTACT_TRACING_SERVIVE -> {
-                    stopContactTracing()
-                    isFirstStart = true
-                    stopSelf()
+                    killService()
+                }
+                ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA -> {
+
+                    sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA)
+
+                    if (isFirstStart) {
+                        handler.postDelayed({
+                            startForegroundService()
+                        }, 1000)
+                        isFirstStart = false
+                    }
                 }
             }
         }
         return super.onStartCommand(intent, flags, startId)
     }
 
+    private fun killService() {
+        isFirstStart = true
+        stopContactTracing()
+        stopForeground(true)
+        stopSelf()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("service", "en el on Destroy del servicio")
+        isFirstStart = true
+    }
 
 
-    private fun startForegroundService(){
+    private fun startForegroundService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
                 as NotificationManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
         }
 
@@ -112,6 +142,7 @@ class ContactTracingService : LifecycleService() {
             handler.post(scan)
             handler.post(changeKey)
         }
+
     }
 
     internal fun stopContactTracing() {
@@ -130,11 +161,15 @@ class ContactTracingService : LifecycleService() {
     // Cambia la Key del service data cada hora
     private val changeKey = object : Runnable {
         override fun run() {
-            handler.postDelayed(this, 120000) //Todo(Cambiar a 3600000 cuando terminen las pruebas)
             bleAdvertiser.stopAdvertising(advertiseCallback)
-            //infectionCheck()
+            infectionCheck()
+            Log.i("Cambio de public key", "Llave antes del cambio: $currentKey")
             currentKey = keyList.random()
+            Log.i("Cambio de public key", "Llave despues del cambio: $currentKey")
             startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
+            handler.postDelayed(this,
+                120000) //Todo(Cambiar a 3600000 cuando terminen las pruebas)
+
         }
     }
 
@@ -168,11 +203,9 @@ class ContactTracingService : LifecycleService() {
             with(Dispatchers.IO) { db.borrarContactsMasde14Dias() }
         }
 
-    private fun getCloseContacts() = db.getAllContactSortByDate()
-
-    internal fun deleteAllInfo() =
-        lifecycleScope.launch {
-            with(Dispatchers.IO) { db.clear() }
+    private fun getCloseContacts() =
+        lifecycleScope.launch(Dispatchers.IO) {
+            contactosCercanos = db.getAllContactSortByDate()
         }
 
 
@@ -190,6 +223,10 @@ class ContactTracingService : LifecycleService() {
 
     private fun agregarContactoALaBasedeDatos() {
         for (Device in Bluetooth_Devices) {
+            Log.i(
+                "Test Distancia",
+                "Dispocitivo Key publica ${Device.decodedServiceData},\nRSSI: ${Device.RSSI} \nPower Level:${Device.txPowerLevel} \n Distancia ${Device.distance}"
+            )
             if (Device.distance < 2) {
                 if (Bluetooth_Devices_D.contains(Device.decodedServiceData)) {
                     insertContact(Device)
@@ -220,26 +257,29 @@ class ContactTracingService : LifecycleService() {
     private var scanning = false
     private val handler = Handler(Looper.getMainLooper())
     private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg
-    private val filter = ScanFilter.Builder()
-        .setServiceUuid(ParcelUuid(Constantes.My_UUID))
+    var test: ByteArray = numberToByteArray(0)
+
+    var filter = ScanFilter.Builder()
+        .setServiceData(ParcelUuid(My_UUID), test, test)
         .build()
-    private val devfilters: MutableList<ScanFilter> = ArrayList()
+    private val devfilters: List<ScanFilter> = arrayListOf(filter)
     private val scanSettings = ScanSettings.Builder()
+
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
 
     private fun startBleScan() {
-        devfilters.add(filter)
         if (!bluetoothActivado.value!!) {
             getMainActivityPendingIntent()//todo = revisar funcionalidad
         } else {
-            bleScanner.startScan(devfilters, scanSettings, scanCallback)
+            //bleScanner.stopScan(scanCallback)
+            //bleScanner.startScan(null, scanSettings, scanCallback)
             if (!scanning) { // Stops scanning after a pre-defined scan period.
                 handler.postDelayed({
                     scanning = false
-                    Log.i("Device", "termino el Scan")
+                    Log.i("ScanCallback", "termino el Scan")
                     bleScanner.stopScan(scanCallback)
-                    scanResults.clear()
+                    //scanResults.clear()
                     if (current_list == "A") {
                         current_list = "B"
                         if (!firstscan) {
@@ -248,7 +288,7 @@ class ContactTracingService : LifecycleService() {
                             Bluetooth_Devices_D.addAll(Bluetooth_Devices_C.filterNot {
                                 Bluetooth_Devices_D.contains(it)
                             } as MutableList<Int>)
-                            Log.i("Results",
+                            Log.i("ScanCallback",
                                 "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
                             Bluetooth_Devices_B.clear()
                         }
@@ -273,8 +313,9 @@ class ContactTracingService : LifecycleService() {
                     agregarContactoALaBasedeDatos()
                 }, SCAN_PERIOD)
                 scanning = true
-                Log.i("Device", "empezo el Scan")
-                bleScanner.startScan(devfilters, scanSettings, scanCallback)
+                Log.i("ScanCallback", "empezo el Scan")
+                bleScanner.stopScan(scanCallback)
+                bleScanner.startScan(null, scanSettings, scanCallback)
             } else {
                 scanning = false
                 bleScanner.stopScan(scanCallback)
@@ -285,6 +326,10 @@ class ContactTracingService : LifecycleService() {
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val rssi = result.rssi
+            Log.i(
+                "ScanCallback",
+                "Dentro del results"
+            )
             val indexQuery = scanResults.indexOfFirst { it.device.address == result.device.address }
             if (indexQuery != -1) { // A scan result already exists with the same address
                 scanResults[indexQuery] = result
@@ -292,7 +337,7 @@ class ContactTracingService : LifecycleService() {
                 with(result.device) {
                     Log.i(
                         "ScanCallback",
-                        "Found BLE device! Name: ${name ?: "Unnamed"}, address: $address, RSSI: $rssi"
+                        "Found BLE device! Name: ${name ?: "Unnamed"}, address: $address, RSSI: $rssi, TXPower: ${result.scanRecord!!.txPowerLevel}"
                     )
                 }
                 scanResults.add(result)
@@ -300,12 +345,12 @@ class ContactTracingService : LifecycleService() {
                 if (current_list == "A") {
                     Bluetooth_Devices_A.add(
                         read4BytesFromBuffer(result.scanRecord!!.getServiceData(ParcelUuid(
-                            Constantes.My_UUID))!!))
+                            My_UUID))!!))
 
                 } else {
                     Bluetooth_Devices_B.add(
                         read4BytesFromBuffer(result.scanRecord!!.getServiceData(ParcelUuid(
-                            Constantes.My_UUID))!!))
+                            My_UUID))!!))
                 }
                 //Get Contact Date
                 val dateTime: Date = Calendar.getInstance().time
@@ -315,7 +360,7 @@ class ContactTracingService : LifecycleService() {
                         result.device.address,
                         result.rssi,
                         result.scanRecord!!.txPowerLevel,
-                        result.scanRecord!!.getServiceData(ParcelUuid(Constantes.My_UUID))!!,
+                        result.scanRecord!!.getServiceData(ParcelUuid(My_UUID))!!,
                         contactDate
                     )
                 )
@@ -336,7 +381,7 @@ class ContactTracingService : LifecycleService() {
 
     private val advertiseData = AdvertiseData.Builder()
         .setIncludeTxPowerLevel(true)
-        .addServiceData(ParcelUuid(Constantes.My_UUID), serviceData)
+        .addServiceData(ParcelUuid(My_UUID), serviceData)
         .build()
 
     private fun startAdvertising(
@@ -353,7 +398,7 @@ class ContactTracingService : LifecycleService() {
             if (settingsInEffect != null) {
                 Log.i(
                     "AdverticeCallback",
-                    "Se esta enviando la info $advertiseSettings con tx ${advertiseSettings.txPowerLevel}"
+                    "Se esta enviando la info $advertiseSettings con tx ${advertiseSettings.txPowerLevel} y UUID:${advertiseData.serviceUuids} /n Service Data: ${advertiseData.serviceData}"
                 )
             } else {
                 Log.i(
@@ -374,20 +419,18 @@ class ContactTracingService : LifecycleService() {
 
 
     //Revisar si se ha tenido contacto con alguninfectado
-    lateinit var publicKeyInfectadosCompleta: MutableList<Int>
+    var publicKeyInfectadosCompleta: MutableList<Int> = mutableListOf<Int>()
+
     fun infectionCheck() {
-        runBlocking {
-            deleteOldContacts().join()
-            Log.i("Corutinas", "Dentro de la primera")
-        }
+        deleteOldContacts()
         getCloseContacts()
         fsdb.collection("Infectados")
             .get()
             .addOnSuccessListener { result ->
                 for (infectado in result) {
                     Log.d("Descarga Infectados", "${infectado.id} => ${infectado.data}")
-                    var infectadokey = infectado.get("key").toString().toInt()
-                    var publicKeyInfectados = getRandomList(Random(infectadokey))
+                    val infectadokey = infectado.get("key").toString().toInt()
+                    val publicKeyInfectados = getRandomList(Random(infectadokey))
                     for (publickey in publicKeyInfectados) {
                         publicKeyInfectadosCompleta.add(publickey)
                     }
@@ -398,7 +441,7 @@ class ContactTracingService : LifecycleService() {
             }
         for (contacto in contactosCercanos) {
             if (publicKeyInfectadosCompleta.contains(contacto.decodedServiceData)) {
-                sendNotificatioInfeccion()
+                sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION)
             } else {
                 publicKeyInfectadosCompleta.clear()
             }
@@ -406,22 +449,32 @@ class ContactTracingService : LifecycleService() {
     }
 
     //Configuracion Notificacion Infeccion
-    fun sendNotificatioInfeccion() {
+    fun sendNotificatioInfeccion(notificationIDs: Int) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
                 as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannelNotificacion(notificationManager)
         }
-        val notificationBuilder =
-            NotificationCompat.Builder(this, Constantes.NOTIFICATION_CHANNEL_ID_NOTIFICACION)
+        if (NOTIFICATION_ID_NOTIFICACION == notificationIDs) {
+            val notificationBuilder =
+                NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID_NOTIFICACION)
+                    .setAutoCancel(false)
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setContentText("UCAB Contact Tracing")
+                    .setContentText("Uno persona con la que estuvo en contacto resulto positivo para COVID-19")
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setContentIntent(getMainActivityPendingIntentNotificacion())
+            notificationManager.notify(NOTIFICATION_ID_NOTIFICACION,
+                notificationBuilder.build())
+        } else {
+            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID_NOTIFICACION)
                 .setAutoCancel(false)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentText("UCAB Contact Tracing")
-                .setContentText("Uno persona con la que estuvo en contacto resulto positivo para COVID-19")
+                .setContentText("A finalizado su periodo de cuarentena para su comodidad hemos activado el seguimiento de contactos cercnos")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(getMainActivityPendingIntentNotificacion())
-        notificationManager.notify(Constantes.NOTIFICATION_ID_NOTIFICACION,
-            notificationBuilder.build())
+                .setContentIntent(getMainActivityPendingIntent())
+        }
     }
 
     fun getMainActivityPendingIntentNotificacion() = PendingIntent.getActivity(
@@ -435,11 +488,11 @@ class ContactTracingService : LifecycleService() {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannelNotificacion(notificationManager: NotificationManager) {
+    fun createNotificationChannelNotificacion(notificationManager: NotificationManager) {
         val channel =
             NotificationChannel(
-                Constantes.NOTIFICATION_CHANNEL_ID_NOTIFICACION,
-                Constantes.NOTIFICATION_CHANNEL_NAME_NOTIFICACION,
+                NOTIFICATION_CHANNEL_ID_NOTIFICACION,
+                NOTIFICATION_CHANNEL_NAME_NOTIFICACION,
                 NotificationManager.IMPORTANCE_HIGH
             )
         notificationManager.createNotificationChannel(channel)

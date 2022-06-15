@@ -8,6 +8,7 @@ import kotlin.math.pow
 
 val base = 10
 
+
 @Entity(tableName = "table_of_contacts")
 data class ContactTracing(
     @PrimaryKey
@@ -17,9 +18,10 @@ data class ContactTracing(
     var serviceData: ByteArray,
     var contactDate: Long,
 ) {
-    var decodedServiceData = read4BytesFromBuffer(serviceData)
-    var exponent = (RSSI - txPowerLevel) / -10 * 2
+    var exponent = ((txPowerLevel - RSSI) / -10 * 2)
     var distance = base.toDouble().pow(exponent.toDouble())
+
+    var decodedServiceData = read4BytesFromBuffer(serviceData)
 
     fun read4BytesFromBuffer(buffer: ByteArray, offset: Int = 0): Int {
         return (buffer[offset + 3].toInt() shl 24) or

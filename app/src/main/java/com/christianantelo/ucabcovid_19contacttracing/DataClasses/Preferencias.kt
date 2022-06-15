@@ -1,6 +1,7 @@
 package com.christianantelo.ucabcovid_19contacttracing.DataClasses
 
 import android.content.Context
+import java.util.*
 
 
 class Preferencias(val context: Context) {
@@ -31,6 +32,18 @@ class Preferencias(val context: Context) {
 
     fun deleteall() {
         storage.edit().clear()
+    }
+
+    fun saveInfectionDate() {
+        val dateTime: Date = Calendar.getInstance().time
+        val infectionDate: Long = dateTime.time
+        storage.edit().putLong("infectionDate", infectionDate)
+    }
+
+    fun getInfectionDate(): Long {
+        val dateTime: Date = Calendar.getInstance().time
+        val infectionDate: Long = dateTime.time
+        return storage.getLong("infectionDate", (infectionDate - 200))
     }
 
 }

@@ -29,8 +29,10 @@ class Notificacion_de_Infeccion_Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         btn_return_to_main_notificacion_infeccion.setOnClickListener {
             (activity as MainActivity).stopContactTracing()
+
         }
     }
 

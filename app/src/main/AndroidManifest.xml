@@ -33,6 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.MainActivity" />
+        <receiver android:name=".alarms.AlarmReciver" />
 
         <service
             android:name=".Servicios.ContactTracingService"
