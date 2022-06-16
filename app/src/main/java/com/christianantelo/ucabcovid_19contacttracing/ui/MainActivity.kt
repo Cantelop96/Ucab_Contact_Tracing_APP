@@ -2,8 +2,6 @@ package com.christianantelo.ucabcovid_19contacttracing.ui
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -20,17 +18,16 @@ import androidx.navigation.fragment.findNavController
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_NOTIFICACION_INFECCION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_START_OR_RESUME_SERVICE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_STOP_CONTACT_TRACING_SERVIVE
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ENABLE_BLUETOOTH_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.LOCATION_PERMISSION_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.Servicios.ContactTracingService
-import com.christianantelo.ucabcovid_19contacttracing.alarms.AlarmReciver
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -56,7 +53,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         navigateToNotificaciondeInfeccion(intent)
 
         if (bluetoothAdapter == null) {
@@ -73,6 +69,7 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
         }
         bluetoothActivado.postValue(true)
+        requestLocationPermission()
         sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
 
     }
@@ -100,6 +97,9 @@ class MainActivity : AppCompatActivity() {
     private val isLocationPermissionGranted
         get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
 
+    private val isBackgroundLocationPermissionGranted
+        get() = hasPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+
     private fun Context.hasPermission(permissionType: String): Boolean {
         return ContextCompat.checkSelfPermission(this, permissionType) ==
                 PackageManager.PERMISSION_GRANTED
@@ -113,13 +113,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestLocationPermission() {
-        if (isLocationPermissionGranted) {
+        if (isLocationPermissionGranted && isBackgroundLocationPermissionGranted) {
+            seTienePermiso.postValue(true)
             return
         }
-        requestPermission(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            LOCATION_PERMISSION_REQUEST_CODE
-        )
+        if (!isLocationPermissionGranted) {
+            requestPermission(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
+        if (!isBackgroundLocationPermissionGranted) {
+            requestPermission(
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -132,8 +141,11 @@ class MainActivity : AppCompatActivity() {
             LOCATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
                     requestLocationPermission()
-                } else {
-                    seTienePermiso.postValue(true)
+                }
+            }
+            BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
+                    requestLocationPermission()
                 }
             }
         }

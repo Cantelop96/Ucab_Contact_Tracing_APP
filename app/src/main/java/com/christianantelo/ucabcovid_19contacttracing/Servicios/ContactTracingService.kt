@@ -257,11 +257,12 @@ class ContactTracingService : LifecycleService() {
     private var scanning = false
     private val handler = Handler(Looper.getMainLooper())
     private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg
-    var test: ByteArray = numberToByteArray(0)
+    var test: ByteArray = numberToByteArray(577042883)
 
     var filter = ScanFilter.Builder()
-        .setServiceData(ParcelUuid(My_UUID), test, test)
+        .setServiceData(ParcelUuid(My_UUID), test)
         .build()
+
     private val devfilters: List<ScanFilter> = arrayListOf(filter)
     private val scanSettings = ScanSettings.Builder()
 
@@ -269,6 +270,8 @@ class ContactTracingService : LifecycleService() {
         .build()
 
     private fun startBleScan() {
+        Log.i("ScanCallback", " Filter:$filter\n" +
+                "Test ${test}")
         if (!bluetoothActivado.value!!) {
             getMainActivityPendingIntent()//todo = revisar funcionalidad
         } else {
@@ -315,7 +318,7 @@ class ContactTracingService : LifecycleService() {
                 scanning = true
                 Log.i("ScanCallback", "empezo el Scan")
                 bleScanner.stopScan(scanCallback)
-                bleScanner.startScan(null, scanSettings, scanCallback)
+                bleScanner.startScan(devfilters, scanSettings, scanCallback)
             } else {
                 scanning = false
                 bleScanner.stopScan(scanCallback)
@@ -398,7 +401,7 @@ class ContactTracingService : LifecycleService() {
             if (settingsInEffect != null) {
                 Log.i(
                     "AdverticeCallback",
-                    "Se esta enviando la info $advertiseSettings con tx ${advertiseSettings.txPowerLevel} y UUID:${advertiseData.serviceUuids} /n Service Data: ${advertiseData.serviceData}"
+                    "Se esta enviando la info $advertiseSettings con tx ${advertiseSettings.txPowerLevel} y UUID:${advertiseData.serviceUuids} /n Service Data: ${advertiseData.serviceData}\n ${currentKey}"
                 )
             } else {
                 Log.i(

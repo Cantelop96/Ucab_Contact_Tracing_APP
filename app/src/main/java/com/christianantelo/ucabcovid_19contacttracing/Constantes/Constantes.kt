@@ -22,5 +22,6 @@ object Constantes {
 
     const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
     const val LOCATION_PERMISSION_REQUEST_CODE = 2
+    const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 3
 
 }
