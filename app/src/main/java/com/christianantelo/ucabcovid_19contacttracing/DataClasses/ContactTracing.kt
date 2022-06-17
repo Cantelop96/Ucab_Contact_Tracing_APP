@@ -15,18 +15,12 @@ data class ContactTracing(
     var address: String,
     var RSSI: Int,
     var txPowerLevel: Int,
-    var serviceData: ByteArray,
+    var serviceData: Int,
     var contactDate: Long,
 ) {
     var exponent = ((txPowerLevel - RSSI) / -10 * 2)
     var distance = base.toDouble().pow(exponent.toDouble())
 
-    var decodedServiceData = read4BytesFromBuffer(serviceData)
+    //var decodedServiceData = read4BytesFromBuffer(serviceData)
 
-    fun read4BytesFromBuffer(buffer: ByteArray, offset: Int = 0): Int {
-        return (buffer[offset + 3].toInt() shl 24) or
-                (buffer[offset + 2].toInt() and 0xff shl 16) or
-                (buffer[offset + 1].toInt() and 0xff shl 8) or
-                (buffer[offset + 0].toInt() and 0xff)
-    }
 }

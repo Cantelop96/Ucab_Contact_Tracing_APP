@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
         }
         bluetoothActivado.postValue(true)
-        requestLocationPermission()
+
         sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
 
     }
@@ -138,12 +138,12 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            LOCATION_PERMISSION_REQUEST_CODE -> {
+            BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
                     requestLocationPermission()
                 }
             }
-            BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE -> {
+            LOCATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
                     requestLocationPermission()
                 }

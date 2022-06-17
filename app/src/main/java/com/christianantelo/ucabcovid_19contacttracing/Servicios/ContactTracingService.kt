@@ -166,6 +166,7 @@ class ContactTracingService : LifecycleService() {
             Log.i("Cambio de public key", "Llave antes del cambio: $currentKey")
             currentKey = keyList.random()
             Log.i("Cambio de public key", "Llave despues del cambio: $currentKey")
+            bluetoothAdapter.name = "$currentKey"
             startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
             handler.postDelayed(this,
                 120000) //Todo(Cambiar a 3600000 cuando terminen las pruebas)
@@ -208,7 +209,7 @@ class ContactTracingService : LifecycleService() {
             contactosCercanos = db.getAllContactSortByDate()
         }
 
-
+    //todo= si se quita el service data eliminar esto
     //convierte el key en un bytearray para poder agregarlo al advertizer
     private fun numberToByteArray(data: Number, size: Int = 4): ByteArray =
         ByteArray(size) { i -> (data.toInt() shr (i * 8)).toByte() }
@@ -225,10 +226,10 @@ class ContactTracingService : LifecycleService() {
         for (Device in Bluetooth_Devices) {
             Log.i(
                 "Test Distancia",
-                "Dispocitivo Key publica ${Device.decodedServiceData},\nRSSI: ${Device.RSSI} \nPower Level:${Device.txPowerLevel} \n Distancia ${Device.distance}"
+                "Dispocitivo Key publica ${Device.serviceData},\nRSSI: ${Device.RSSI} \nPower Level:${Device.txPowerLevel} \n Distancia ${Device.distance}"
             )
             if (Device.distance < 2) {
-                if (Bluetooth_Devices_D.contains(Device.decodedServiceData)) {
+                if (Bluetooth_Devices_D.contains(Device.serviceData)) {
                     insertContact(Device)
                     Log.i("DB", "Añade $Device a la DB")
                 }
@@ -257,21 +258,18 @@ class ContactTracingService : LifecycleService() {
     private var scanning = false
     private val handler = Handler(Looper.getMainLooper())
     private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg
-    var test: ByteArray = numberToByteArray(577042883)
+
 
     var filter = ScanFilter.Builder()
-        .setServiceData(ParcelUuid(My_UUID), test)
+        .setServiceUuid(ParcelUuid(My_UUID))
         .build()
 
     private val devfilters: List<ScanFilter> = arrayListOf(filter)
     private val scanSettings = ScanSettings.Builder()
-
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
 
     private fun startBleScan() {
-        Log.i("ScanCallback", " Filter:$filter\n" +
-                "Test ${test}")
         if (!bluetoothActivado.value!!) {
             getMainActivityPendingIntent()//todo = revisar funcionalidad
         } else {
@@ -347,13 +345,17 @@ class ContactTracingService : LifecycleService() {
 
                 if (current_list == "A") {
                     Bluetooth_Devices_A.add(
-                        read4BytesFromBuffer(result.scanRecord!!.getServiceData(ParcelUuid(
-                            My_UUID))!!))
+                        result.device.name.toInt()
+                        //read4BytesFromBuffer(result.scanRecord!!.getServiceData(ParcelUuid(
+                        // My_UUID))!!)
+                    )
 
                 } else {
                     Bluetooth_Devices_B.add(
-                        read4BytesFromBuffer(result.scanRecord!!.getServiceData(ParcelUuid(
-                            My_UUID))!!))
+                        result.device.name.toInt()
+                        //read4BytesFromBuffer(result.scanRecord!!.getServiceData(ParcelUuid(
+                        //   My_UUID))!!)
+                    )
                 }
                 //Get Contact Date
                 val dateTime: Date = Calendar.getInstance().time
@@ -363,7 +365,7 @@ class ContactTracingService : LifecycleService() {
                         result.device.address,
                         result.rssi,
                         result.scanRecord!!.txPowerLevel,
-                        result.scanRecord!!.getServiceData(ParcelUuid(My_UUID))!!,
+                        result.device.name.toInt(),
                         contactDate
                     )
                 )
@@ -380,11 +382,12 @@ class ContactTracingService : LifecycleService() {
         AdvertiseSettings.Builder()
             .setAdvertiseMode(1)
             .setTxPowerLevel(1)
+            .setConnectable(false)
             .build()
 
     private val advertiseData = AdvertiseData.Builder()
         .setIncludeTxPowerLevel(true)
-        .addServiceData(ParcelUuid(My_UUID), serviceData)
+        .addServiceUuid(ParcelUuid(My_UUID))
         .build()
 
     private fun startAdvertising(
@@ -392,6 +395,7 @@ class ContactTracingService : LifecycleService() {
         advertiseData: AdvertiseData,
         callback: AdvertiseCallback,
     ) {
+        bluetoothAdapter.name = "$currentKey"
         bleAdvertiser.startAdvertising(settings, advertiseData, callback)
     }
 
@@ -443,7 +447,7 @@ class ContactTracingService : LifecycleService() {
                 Log.w("Descarga Infectados", "Error getting documents.", exception)
             }
         for (contacto in contactosCercanos) {
-            if (publicKeyInfectadosCompleta.contains(contacto.decodedServiceData)) {
+            if (publicKeyInfectadosCompleta.contains(contacto.serviceData)) {
                 sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION)
             } else {
                 publicKeyInfectadosCompleta.clear()
