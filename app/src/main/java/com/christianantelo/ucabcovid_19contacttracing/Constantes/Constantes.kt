@@ -5,7 +5,7 @@ import java.util.*
 object Constantes {
 
     const val NOMBRE_DE_LA_BASE_DE_DATOS = "contactos_cercanos_db"
-    val My_UUID = UUID.fromString("9778965b-73f1-4003-953a-9432d3c6fb26")
+    val My_UUID = "0000950d-0000-1000-8000-00805f9b34fb"
     const val ACTION_START_OR_RESUME_SERVICE = "ACTION_START_OR_RESUME_SERVICE"
     const val ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA =
         "ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA"

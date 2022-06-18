@@ -34,7 +34,8 @@ class FirstTimeKeyGen_Activity : AppCompatActivity() {
 
         permissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-                //isLocationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: isLocationPermissionGranted
+                isLocationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION]
+                    ?: isLocationPermissionGranted
                 isBackgroundPermissionGranted =
                     permissions[Manifest.permission.ACCESS_BACKGROUND_LOCATION]
                         ?: isBackgroundPermissionGranted
@@ -69,6 +70,7 @@ class FirstTimeKeyGen_Activity : AppCompatActivity() {
         } else {
             Log.i("Inicio", "Directo al Main $firsttime + $privateKey"
             )
+            requestPermissions()
             goToMain()
         }
     }

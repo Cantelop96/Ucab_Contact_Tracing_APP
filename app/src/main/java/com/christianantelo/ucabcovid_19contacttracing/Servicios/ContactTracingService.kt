@@ -169,7 +169,7 @@ class ContactTracingService : LifecycleService() {
             bluetoothAdapter.name = "$currentKey"
             startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
             handler.postDelayed(this,
-                120000) //Todo(Cambiar a 3600000 cuando terminen las pruebas)
+                240000) //Todo(Cambiar a 3600000 cuando terminen las pruebas)
 
         }
     }
@@ -225,7 +225,7 @@ class ContactTracingService : LifecycleService() {
     private fun agregarContactoALaBasedeDatos() {
         for (Device in Bluetooth_Devices) {
             Log.i(
-                "Test Distancia",
+                "Test Distancia Callback",
                 "Dispocitivo Key publica ${Device.serviceData},\nRSSI: ${Device.RSSI} \nPower Level:${Device.txPowerLevel} \n Distancia ${Device.distance}"
             )
             if (Device.distance < 2) {
@@ -261,7 +261,7 @@ class ContactTracingService : LifecycleService() {
 
 
     var filter = ScanFilter.Builder()
-        .setServiceUuid(ParcelUuid(My_UUID))
+        .setServiceUuid(ParcelUuid.fromString(My_UUID))
         .build()
 
     private val devfilters: List<ScanFilter> = arrayListOf(filter)
@@ -327,10 +327,6 @@ class ContactTracingService : LifecycleService() {
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val rssi = result.rssi
-            Log.i(
-                "ScanCallback",
-                "Dentro del results"
-            )
             val indexQuery = scanResults.indexOfFirst { it.device.address == result.device.address }
             if (indexQuery != -1) { // A scan result already exists with the same address
                 scanResults[indexQuery] = result
@@ -381,13 +377,15 @@ class ContactTracingService : LifecycleService() {
     private val advertiseSettings =
         AdvertiseSettings.Builder()
             .setAdvertiseMode(1)
-            .setTxPowerLevel(1)
+            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_LOW)
             .setConnectable(false)
             .build()
 
     private val advertiseData = AdvertiseData.Builder()
+        .setIncludeDeviceName(true)
         .setIncludeTxPowerLevel(true)
-        .addServiceUuid(ParcelUuid(My_UUID))
+        .addServiceUuid(ParcelUuid.fromString(My_UUID))
+
         .build()
 
     private fun startAdvertising(
