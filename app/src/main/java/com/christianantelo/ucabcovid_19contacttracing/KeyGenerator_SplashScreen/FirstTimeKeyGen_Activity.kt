@@ -1,35 +1,101 @@
 package com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen
 
+import android.Manifest
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_first_time_key_gen.*
 import java.security.KeyPairGenerator
+import kotlin.properties.Delegates
 
 class FirstTimeKeyGen_Activity : AppCompatActivity() {
+
+    companion object {
+        var isBackgroundPermissionGranted by Delegates.notNull<Boolean>()
+        var isLocationPermissionGranted by Delegates.notNull<Boolean>()
+    }
+
+    private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        isBackgroundPermissionGranted = false
+        isLocationPermissionGranted = false
+
+        permissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                //isLocationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: isLocationPermissionGranted
+                isBackgroundPermissionGranted =
+                    permissions[Manifest.permission.ACCESS_BACKGROUND_LOCATION]
+                        ?: isBackgroundPermissionGranted
+            }
         var privateKey = Application.pref.getKey()
         setContentView(R.layout.activity_first_time_key_gen)
+
+
         val firsttime = Application.pref.getFirstTime()
         if (privateKey == "0".toLong()) {
+            requestPermissions()
             Application.pref.saveFirstTime(false) // persist value of false
             val generator = KeyPairGenerator.getInstance("RSA")
             val pair = generator.generateKeyPair()
             privateKey = read4BytesFromBuffer(pair.private.encoded).toLong()
             btn_aceptarTerminosyCondiciones.setOnClickListener {
-                Application.pref.saveKey(privateKey)
-                Log.i("Inicio", "Clave Generada $privateKey")
-                goToMain()
+                if (isBackgroundPermissionGranted) {
+                    Application.pref.saveKey(privateKey)
+                    Log.i("Inicio", "Clave Generada $privateKey")
+                    goToMain()
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Es necesario que se accepten los permisos para el correcto funcionamiento de la Aplicacion",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    requestPermissions()
+                }
+
+
             }
         } else {
             Log.i("Inicio", "Directo al Main $firsttime + $privateKey"
             )
             goToMain()
+        }
+    }
+
+
+    private fun requestPermissions() {
+        Log.i("Callback", "DENTRO DE REQUEST PERMISOS")
+
+        isBackgroundPermissionGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+        isLocationPermissionGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+        val permissionRequest: MutableList<String> = ArrayList()
+
+        if (!isLocationPermissionGranted) {
+            permissionRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if (!isBackgroundPermissionGranted) {
+            permissionRequest.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+        if (permissionRequest.isNotEmpty()) {
+
+            permissionLauncher.launch(permissionRequest.toTypedArray())
         }
     }
 

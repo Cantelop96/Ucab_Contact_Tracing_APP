@@ -425,7 +425,7 @@ class ContactTracingService : LifecycleService() {
     }
 
 
-    //Revisar si se ha tenido contacto con alguninfectado
+    //Revisar si se ha tenido contacto con algun infectado
     var publicKeyInfectadosCompleta: MutableList<Int> = mutableListOf<Int>()
 
     fun infectionCheck() {
@@ -492,7 +492,6 @@ class ContactTracingService : LifecycleService() {
         },
         0
     )
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createNotificationChannelNotificacion(notificationManager: NotificationManager) {

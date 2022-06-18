@@ -2,14 +2,21 @@ package com.christianantelo.ucabcovid_19contacttracing.ui
 
 import android.Manifest
 import android.app.Activity
+import android.app.Instrumentation
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.input.key.Key.Companion.I
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +29,8 @@ import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.BACK
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ENABLE_BLUETOOTH_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.LOCATION_PERMISSION_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
+import com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen.FirstTimeKeyGen_Activity.Companion.isBackgroundPermissionGranted
+import com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen.FirstTimeKeyGen_Activity.Companion.isLocationPermissionGranted
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.Servicios.ContactTracingService
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
@@ -70,16 +79,23 @@ class MainActivity : AppCompatActivity() {
         }
         bluetoothActivado.postValue(true)
 
-        sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
+        Log.i("Callback 2.0",
+            "isLocationPermissionGranted ${isLocationPermissionGranted}, isBackgroundPermissionGranted ${isBackgroundPermissionGranted} ")
 
+        if (isLocationPermissionGranted && isBackgroundPermissionGranted) {
+            sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
+        }
     }
-
     override fun onResume() {
         super.onResume()
+        Log.i("Callback 2.0",
+            "isLocationPermissionGranted $isLocationPermissionGranted, isBackgroundPermissionGranted $isBackgroundPermissionGranted ")
         if (!bluetoothAdapter.isEnabled) {
             bluetoothActivado.postValue(false)
             promptEnableBluetooth()
         }
+
+
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -87,72 +103,18 @@ class MainActivity : AppCompatActivity() {
         navigateToNotificaciondeInfeccion(intent)
     }
 
+
     internal fun sendCommandToService(action: String) =
         Intent(this, ContactTracingService::class.java).also {
             it.action = action
             this.startService(it)
         }
 
-    // Permisos
-    private val isLocationPermissionGranted
-        get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-
-    private val isBackgroundLocationPermissionGranted
-        get() = hasPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-
-    private fun Context.hasPermission(permissionType: String): Boolean {
-        return ContextCompat.checkSelfPermission(this, permissionType) ==
-                PackageManager.PERMISSION_GRANTED
-    }
-
     private fun promptEnableBluetooth() {
         if (!bluetoothAdapter.isEnabled) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
         }
-    }
-
-    private fun requestLocationPermission() {
-        if (isLocationPermissionGranted && isBackgroundLocationPermissionGranted) {
-            seTienePermiso.postValue(true)
-            return
-        }
-        if (!isLocationPermissionGranted) {
-            requestPermission(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
-        }
-        if (!isBackgroundLocationPermissionGranted) {
-            requestPermission(
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
-            )
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
-                    requestLocationPermission()
-                }
-            }
-            LOCATION_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
-                    requestLocationPermission()
-                }
-            }
-        }
-    }
-
-    private fun Activity.requestPermission(permission: String, requestCode: Int) {
-        ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

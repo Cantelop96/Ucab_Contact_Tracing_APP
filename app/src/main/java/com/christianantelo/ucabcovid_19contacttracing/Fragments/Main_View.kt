@@ -31,11 +31,14 @@ class Main_View : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_main__view, container, false)
+
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
 
         if (pref.getContactTracingState()) {
             tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Activo"
