@@ -23,4 +23,6 @@
     <string name="Body_Settings">En esta ventana usted podra activar o desactivar el seguimiento de contactos cercanos</string>
     <string name="Body_Resultado_prueba_positivo">Le pedimos que por favor se aisle usted y su familia, cumpla con todas las medidas de seguridas y contacte con un especialista en el tema.\n\n Para proteger su privacidad el seguimiento de contactos cercano sera detenido en este momento y se contactara a todas las personas con las que alla tenido contacto en los ultimos 15 dias.</string>
     <string name="Body_eliminar_toda_la_informacion">Al hacer click en el boton de eliminar toda mi informacion se borraran todos los conatctos cercanos con los que se tuviese contacto y cualquier otra informacion que se suministrace dentro de la aplicacion.\n\nDespues de eliminada su informacion si desea usar nuevamente la aplicacion es necesario que se vuelva a realizar la configuracion inicial.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

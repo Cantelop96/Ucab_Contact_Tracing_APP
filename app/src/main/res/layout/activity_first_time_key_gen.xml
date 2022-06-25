@@ -30,33 +30,48 @@
                 android:text="Bienvenido a UCovid"
                 android:textSize="30dp" />
 
-            <TextView
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="10dp"
-                android:justificationMode="inter_word"
-                android:text="UCovid es un prototipo de aplicaccion que permite hacer seguimiento de contactos cercanos de Covid-19 utilizando Bluetooth Low Energy. \n"
-                android:textSize="20dp" />
+                tools:layout_editor_absoluteX="-1dp"
+                tools:layout_editor_absoluteY="-1dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_aceptarTerminosyCondiciones"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:backgroundTint="@color/celeste"
-                    android:text="Acepto que inicie el seguimineto de contactos cercanos"
-                    android:textColor="@color/negro_fondo"
-                    android:textSize="16dp"
-                    app:cornerRadius="100dp" />
+                    android:gravity="top"
+                    android:orientation="vertical">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="10dp"
+                        android:justificationMode="inter_word"
+                        android:text="UCovid es un prototipo de aplicaccion que permite hacer seguimiento de contactos cercanos de Covid-19 de manera privada, anonima y segura utilizando Bluetooth Low Energy. \n\nPara su funcionamiento es necesario que el Bluetooth este encendido en todo momento y que se habiliten los permisos de localizacion en todo momento."
+                        android:textSize="20dp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="20dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btn_aceptarTerminosyCondiciones"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:backgroundTint="@color/celeste"
+                            android:text="Acepto que inicie el seguimineto de contactos cercanos"
+                            android:textColor="@color/negro_fondo"
+                            android:textSize="16dp"
+                            app:cornerRadius="100dp" />
+
+
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
 
         </LinearLayout>
 
