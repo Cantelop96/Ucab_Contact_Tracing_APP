@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ucab Covid-19 Contact Tracing</string>
+    <string name="app_name">UCovid</string>
     <string name="sintomas">Sintomas</string>
     <string name="resultados_de_prueba">Resultados de Prueba</string>
     <string name="seguimiento_de_contactos_cercanos">Seguimiento de contactos cercanos</string>

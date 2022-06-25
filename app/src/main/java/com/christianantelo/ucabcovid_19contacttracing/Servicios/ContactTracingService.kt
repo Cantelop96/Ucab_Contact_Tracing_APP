@@ -280,7 +280,7 @@ class ContactTracingService : LifecycleService() {
                     scanning = false
                     Log.i("ScanCallback", "termino el Scan")
                     bleScanner.stopScan(scanCallback)
-                    //scanResults.clear()
+                    scanResults.clear()
                     if (current_list == "A") {
                         current_list = "B"
                         if (!firstscan) {
@@ -376,8 +376,8 @@ class ContactTracingService : LifecycleService() {
     // Bluetooth Advertiser
     private val advertiseSettings =
         AdvertiseSettings.Builder()
-            .setAdvertiseMode(1)
-            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_LOW)
+            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
+            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW)
             .setConnectable(false)
             .build()
 
