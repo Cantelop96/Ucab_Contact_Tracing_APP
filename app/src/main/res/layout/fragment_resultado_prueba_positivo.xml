@@ -10,44 +10,64 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="top"
-            android:layout_marginTop="40dp"
             android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp">
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="40dp"
+            android:gravity="top"
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="El Resultado de su Prueba dio positivo "
-                android:textSize="30dp"
-                android:layout_marginVertical="10dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20dp"
                 android:layout_marginVertical="10dp"
-                android:text="Le pedimos que por favor se aisle usted y su familia, cumpla con todas las medidas de seguridas y contacte con un especialista en el tema.\n\n Para proteger su privacidad el seguimiento de contactos cercano sera detenido en este momento y se contactara a todas las personas con las que alla tenido contacto en los ultimos 15 dias."/>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="center">
-                <Button
-                    android:id="@+id/btn_return_to_main_positivo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Regresar a Pantalla Principal"
-                    android:textSize="16dp"
-                    android:textColor="@color/negro_fondo"
-                    app:backgroundTint="@color/celeste"
-                    app:cornerRadius="100dp"/>
-            </LinearLayout>
+                android:text="El Resultado de su Prueba dio positivo "
+                android:textSize="30dp" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout_editor_absoluteX="-1dp"
+                tools:layout_editor_absoluteY="-1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="top"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="10dp"
+                        android:justificationMode="inter_word"
+                        android:text="@string/Body_Resultado_prueba_positivo"
+                        android:textSize="20dp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btn_return_to_main_positivo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Regresar a Pantalla Principal"
+                            android:textColor="@color/negro_fondo"
+                            android:textSize="16dp"
+                            app:backgroundTint="@color/celeste"
+                            app:cornerRadius="100dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
         </LinearLayout>
 
     </LinearLayout>

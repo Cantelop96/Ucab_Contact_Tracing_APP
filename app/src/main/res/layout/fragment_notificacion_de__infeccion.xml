@@ -3,52 +3,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.SobreelAppFragment">
+    tools:context=".Fragments.Notificacion_de_Infeccion_Fragment">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="top"
-            android:layout_marginTop="40dp"
             android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp">
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="40dp"
+            android:gravity="top"
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sobre la aplicacion"
-                android:textSize="30dp"
                 android:layout_marginVertical="10dp"
-                android:justificationMode="inter_word"/>
+                android:text="Usted estuvo en contacto con una persona infectada de COVID-19"
+                android:textSize="30dp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
                 android:layout_marginVertical="10dp"
-                android:text="@string/Sobre_el_App_Texto"
-                android:justificationMode="inter_word"/>
+                android:justificationMode="inter_word"
+                android:text="Le pedimos que por favor se aisle usted y su familia, cumpla con todas las medidas de seguridas y contacte con un especialista en el tema.\n\n Para proteger su privacidad el seguimiento de contactos cercano sera detenido en este momento."
+                android:textSize="20dp" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
                 <Button
-                    android:id="@+id/btn_return_to_main_con_sintomas"
+                    android:id="@+id/btn_return_to_main_notificacion_infeccion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="Regresar a Pantalla Principal"
-                    android:textSize="16dp"
                     android:textColor="@color/negro_fondo"
+                    android:textSize="16dp"
                     app:backgroundTint="@color/celeste"
-                    app:cornerRadius="100dp"/>
+                    app:cornerRadius="100dp" />
             </LinearLayout>
         </LinearLayout>
 

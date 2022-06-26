@@ -5,11 +5,15 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/main_View">
 
+    <action
+        android:id="@+id/action_notificacion_to_reprte_infeccion"
+        app:destination="@id/notificacion_de_Infeccion_Fragment"
+        app:launchSingleTop="true" />
     <fragment
         android:id="@+id/main_View"
         android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.Main_View"
         android:label="fragment_main__view"
-        tools:layout="@layout/fragment_main__view" >
+        tools:layout="@layout/fragment_main__view">
         <action
             android:id="@+id/action_main_View_to_formularioFragment"
             app:destination="@id/formularioFragment" />
@@ -65,6 +69,9 @@
         <action
             android:id="@+id/action_settingsFragment2_to_main_View"
             app:destination="@id/main_View" />
+        <action
+            android:id="@+id/action_settingsFragment2_to_borrarTodoConfirmationFragment2"
+            app:destination="@id/borrarTodoConfirmationFragment2" />
     </fragment>
     <fragment
         android:id="@+id/resultadosPruebaFragment"
@@ -91,9 +98,22 @@
         android:id="@+id/sobreelAppFragment"
         android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.SobreelAppFragment"
         android:label="fragment_sobreel_app"
-        tools:layout="@layout/fragment_sobreel_app" >
+        tools:layout="@layout/fragment_sobreel_app">
         <action
             android:id="@+id/action_sobreelAppFragment_to_main_View"
+            app:destination="@id/main_View" />
+    </fragment>
+    <fragment
+        android:id="@+id/borrarTodoConfirmationFragment2"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.BorrarTodoConfirmationFragment"
+        android:label="BorrarTodoConfirmationFragment" />
+    <fragment
+        android:id="@+id/notificacion_de_Infeccion_Fragment"
+        android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.Notificacion_de_Infeccion_Fragment"
+        android:label="fragment_notificacion_de__infeccion"
+        tools:layout="@layout/fragment_notificacion_de__infeccion" >
+        <action
+            android:id="@+id/action_notificacion_de_Infeccion_Fragment_to_main_View"
             app:destination="@id/main_View" />
     </fragment>
 </navigation>

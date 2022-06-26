@@ -20,20 +20,29 @@
             android:layout_marginTop="20dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginBottom="15dp"
-            >
+            android:layout_marginBottom="15dp">
+
             <TextView
+                android:id="@+id/tx_status_contactTracing"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight=".8"
-                android:text="Aqui indica si esta funcionando el contact tracing"/>
+                android:layout_weight=".1"
+                android:text=" " />
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/gif_imagen"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight=".7"
+                android:background="#fff"
+                android:src="@drawable/radar" />
+
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <Button
                     android:id="@+id/main_boton_sintomas"
