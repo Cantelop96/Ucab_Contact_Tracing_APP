@@ -1,8 +1,7 @@
 package com.christianantelo.ucabcovid_19contacttracing.ui
 
 import android.Manifest
-import android.app.Activity
-import android.app.Instrumentation
+import android.app.*
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -28,15 +27,18 @@ import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTI
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ENABLE_BLUETOOTH_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.LOCATION_PERMISSION_REQUEST_CODE
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
 import com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen.FirstTimeKeyGen_Activity.Companion.isBackgroundPermissionGranted
 import com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen.FirstTimeKeyGen_Activity.Companion.isLocationPermissionGranted
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.Servicios.ContactTracingService
+import com.christianantelo.ucabcovid_19contacttracing.alarms.AlarmReciver
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -166,20 +168,23 @@ class MainActivity : AppCompatActivity() {
         }
 
     //todo = terminar de configurar logica de cuarentena con alarma
-    /*fun setFinalizarCuarentenaAlarm(){
-
-        val dateTime: Date = Calendar.getInstance().time
+    internal fun setFinalizarCuarentenaAlarm(){
+:
         var alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this,AlarmReciver::class.java)
+        val intent = Intent(this, AlarmReciver::class.java)
         var pendingIntent = PendingIntent.getBroadcast(this,0,intent,0)
-        var calendar = Calendar.getInstance()
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,calendar.timeInMillis
+        alarmManager.set(
+            AlarmManager.RTC_WAKEUP,300000,pendingIntent,
+            //todo = devolver a 777600000
         )
-
-
-    }*/
+        Application.pref.saveCuarentenaState(true)
+    }
+    internal fun finalizarCuarentenaAlarma(){
+        var alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReciver::class.java)
+        var pendingIntent = PendingIntent.getBroadcast(this,0,intent,0)
+        alarmManager.cancel(pendingIntent)
+    }
 
 
 }

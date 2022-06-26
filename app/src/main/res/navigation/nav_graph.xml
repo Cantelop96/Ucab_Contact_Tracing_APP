@@ -111,5 +111,9 @@
         android:id="@+id/notificacion_de_Infeccion_Fragment"
         android:name="com.christianantelo.ucabcovid_19contacttracing.Fragments.Notificacion_de_Infeccion_Fragment"
         android:label="fragment_notificacion_de__infeccion"
-        tools:layout="@layout/fragment_notificacion_de__infeccion" />
+        tools:layout="@layout/fragment_notificacion_de__infeccion" >
+        <action
+            android:id="@+id/action_notificacion_de_Infeccion_Fragment_to_main_View"
+            app:destination="@id/main_View" />
+    </fragment>
 </navigation>

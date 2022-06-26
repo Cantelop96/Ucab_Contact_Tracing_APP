@@ -34,16 +34,12 @@ class Preferencias(val context: Context) {
         storage.edit().clear()
     }
 
-    fun saveInfectionDate() {
-        val dateTime: Date = Calendar.getInstance().time
-        val infectionDate: Long = dateTime.time
-        storage.edit().putLong("infectionDate", infectionDate)
+    fun saveCuarentenaState(state:Boolean) {
+        storage.edit().putBoolean("CuarentenaState", state)
     }
 
-    fun getInfectionDate(): Long {
-        val dateTime: Date = Calendar.getInstance().time
-        val infectionDate: Long = dateTime.time
-        return storage.getLong("infectionDate", (infectionDate - 200))
+    fun getCuarentenaState(): Boolean {
+        return storage.getBoolean("CuarentenaState", false)
     }
 
 }

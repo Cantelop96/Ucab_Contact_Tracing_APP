@@ -13,14 +13,24 @@ import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_CHANNEL_ID_NOTIFICACION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.Servicios.ContactTracingService
 import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 
 class AlarmReciver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        (MainActivity as MainActivity).sendCommandToService(Constantes.ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA)
+        Application.pref.saveCuarentenaState(false)
 
+        fun sendCommandToService(action: String) =
+            Intent(context, ContactTracingService::class.java).also {
+                it.action = action
+                if (context != null) {
+                    context.startService(it)
+                }
+            }
+
+        sendCommandToService(Constantes.ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA)
 
     }
 

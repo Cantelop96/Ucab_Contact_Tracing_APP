@@ -42,6 +42,10 @@ class BorrarTodoConfirmationFragment : Fragment() {
         btn_delete_all_info_confirmado.setOnClickListener {
             pref.saveFirstTime(true)
             pref.saveKey(0)
+            if (pref.getCuarentenaState()) {
+                (activity as MainActivity).finalizarCuarentenaAlarma()
+                pref.saveCuarentenaState(false)
+            }
             pref.deleteall()
             (activity as MainActivity).stopContactTracing()
             (activity as MainActivity).deleteAllInfo()

@@ -20,7 +20,7 @@ class SettingsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false)
@@ -53,6 +53,10 @@ class SettingsFragment : Fragment() {
                 if (!pref.getContactTracingState()) {
                     sw_seguimiento_activado.text =
                         "El Seguimiento de contactos cercanos esta Activado"
+                    if (pref.getCuarentenaState()) {
+                        (activity as MainActivity).finalizarCuarentenaAlarma()
+                        pref.saveCuarentenaState(false)
+                    }
                     pref.saveContactTracingState(true)
                     Log.i("Settings", "Se activo el seguimiento contacto cercano")
                     (activity as MainActivity).startContactTracing()

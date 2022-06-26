@@ -209,18 +209,6 @@ class ContactTracingService : LifecycleService() {
             contactosCercanos = db.getAllContactSortByDate()
         }
 
-    //todo= si se quita el service data eliminar esto
-    //convierte el key en un bytearray para poder agregarlo al advertizer
-    private fun numberToByteArray(data: Number, size: Int = 4): ByteArray =
-        ByteArray(size) { i -> (data.toInt() shr (i * 8)).toByte() }
-
-    var serviceData = numberToByteArray(currentKey)
-    fun read4BytesFromBuffer(buffer: ByteArray, offset: Int = 0): Int {
-        return (buffer[offset + 3].toInt() shl 24) or
-                (buffer[offset + 2].toInt() and 0xff shl 16) or
-                (buffer[offset + 1].toInt() and 0xff shl 8) or
-                (buffer[offset + 0].toInt() and 0xff)
-    }
 
     private fun agregarContactoALaBasedeDatos() {
         for (Device in Bluetooth_Devices) {
@@ -273,8 +261,6 @@ class ContactTracingService : LifecycleService() {
         if (!bluetoothActivado.value!!) {
             getMainActivityPendingIntent()//todo = revisar funcionalidad
         } else {
-            //bleScanner.stopScan(scanCallback)
-            //bleScanner.startScan(null, scanSettings, scanCallback)
             if (!scanning) { // Stops scanning after a pre-defined scan period.
                 handler.postDelayed({
                     scanning = false
@@ -447,9 +433,12 @@ class ContactTracingService : LifecycleService() {
         for (contacto in contactosCercanos) {
             if (publicKeyInfectadosCompleta.contains(contacto.serviceData)) {
                 sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION)
-            } else {
-                publicKeyInfectadosCompleta.clear()
+                isInfected.postValue(true)
+                break
             }
+        }
+        if (isInfected.value == false) {
+            publicKeyInfectadosCompleta.clear()
         }
     }
 
@@ -472,13 +461,16 @@ class ContactTracingService : LifecycleService() {
             notificationManager.notify(NOTIFICATION_ID_NOTIFICACION,
                 notificationBuilder.build())
         } else {
+            val notificationBuilder =
             NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID_NOTIFICACION)
                 .setAutoCancel(false)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentText("UCAB Contact Tracing")
-                .setContentText("A finalizado su periodo de cuarentena para su comodidad hemos activado el seguimiento de contactos cercnos")
+                .setContentText("A finalizado su periodo de cuarentena para su comodidad hemos activado el seguimiento de contactos cercanos")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(getMainActivityPendingIntent())
+            notificationManager.notify(NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA,
+                notificationBuilder.build())
         }
     }
 
