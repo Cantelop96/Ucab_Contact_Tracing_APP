@@ -32,6 +32,13 @@ class Main_View : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_main__view, container, false)
 
+        if (pref.getContactTracingState()) {
+            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Activo"
+            gif_imagen.setImageResource(R.drawable.radar)
+        } else {
+            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Desactivado"
+            gif_imagen.setImageResource(R.drawable.warning)
+        }
     }
 
 

@@ -5,6 +5,7 @@
       <map>
         <entry key="..\:/Users/christian.antelo/Documents/Github Repositories/Ucab_Contact_Tracing_APP/app/src/main/res/layout/activity_first_time_key_gen.xml" value="0.11911231884057971" />
         <entry key="..\:/Users/christian.antelo/Documents/Github Repositories/Ucab_Contact_Tracing_APP/app/src/main/res/layout/fragment_main__view.xml" value="0.1" />
+        <entry key="..\:/Users/christian.antelo/Documents/Github Repositories/Ucab_Contact_Tracing_APP/app/src/main/res/layout/fragment_notificacion_de__infeccion.xml" value="0.1796875" />
         <entry key="..\:/Users/christian.antelo/Documents/Github Repositories/Ucab_Contact_Tracing_APP/app/src/main/res/layout/fragment_settings.xml" value="0.11911231884057971" />
         <entry key="..\:/Users/christian.antelo/Documents/Github Repositories/Ucab_Contact_Tracing_APP/app/src/main/res/layout/fragment_sobreel_app.xml" value="0.11911231884057971" />
         <entry key="..\:/Users/christian.antelo/Documents/Github Repositories/Ucab_Contact_Tracing_APP/app/src/main/res/layout/fragment_test.xml" value="0.22" />
@@ -22,7 +23,6 @@
         <entry key="app/src/main/res/layout/fragment_resultados_prueba.xml" value="0.11955420466058764" />
         <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_sobreel_app.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/fragment_test.xml" value="0.22644927536231885" />
       </map>
     </option>
   </component>

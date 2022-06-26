@@ -21,7 +21,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_NOTIFICACION_INFECCION
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_START_OR_RESUME_SERVICE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ACTION_STOP_CONTACT_TRACING_SERVIVE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
@@ -44,7 +46,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        var seTienePermiso = MutableLiveData<Boolean>()
+        var estadoCuarentena = MutableLiveData<Boolean>()
         var bluetoothActivado = MutableLiveData<Boolean>()
 
     }
@@ -75,11 +77,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (!bluetoothAdapter.isEnabled) {
-            bluetoothActivado.postValue(false)
+            bluetoothActivado.setValue(false)
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
         }
-        bluetoothActivado.postValue(true)
+        bluetoothActivado.setValue(true)
 
         Log.i("Callback 2.0",
             "isLocationPermissionGranted ${isLocationPermissionGranted}, isBackgroundPermissionGranted ${isBackgroundPermissionGranted} ")
@@ -87,13 +89,14 @@ class MainActivity : AppCompatActivity() {
         if (isLocationPermissionGranted && isBackgroundPermissionGranted) {
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
         }
+
     }
     override fun onResume() {
         super.onResume()
         Log.i("Callback 2.0",
             "isLocationPermissionGranted $isLocationPermissionGranted, isBackgroundPermissionGranted $isBackgroundPermissionGranted ")
         if (!bluetoothAdapter.isEnabled) {
-            bluetoothActivado.postValue(false)
+            bluetoothActivado.setValue(false)
             promptEnableBluetooth()
         }
 
@@ -124,15 +127,15 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == ENABLE_BLUETOOTH_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 if (bluetoothAdapter.isEnabled) {
-                    bluetoothActivado.postValue(true)
+                    bluetoothActivado.setValue(true)
                     Toast.makeText(this, "Se a activado el Bluetooth.", Toast.LENGTH_SHORT).show()
                 } else {
-                    bluetoothActivado.postValue(false)
+                    bluetoothActivado.setValue(false)
                     Toast.makeText(this, "No se ha activado el Bluetooth", Toast.LENGTH_SHORT)
                         .show()
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                bluetoothActivado.postValue(false)
+                bluetoothActivado.setValue(false)
                 Toast.makeText(
                     this,
                     "Se ha cancelado la activacion del Bluetooth",
@@ -149,6 +152,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigateToNotificaciondeInfeccion(intent: Intent?) {
+        if (intent?.action == ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA) {
+            sendCommandToService(ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA)
+        }
         if (intent?.action == ACTION_NOTIFICACION_INFECCION) {
             Nav_Host.findNavController().navigate(R.id.action_notificacion_to_reprte_infeccion)
         }
@@ -169,12 +175,14 @@ class MainActivity : AppCompatActivity() {
 
     //todo = terminar de configurar logica de cuarentena con alarma
     internal fun setFinalizarCuarentenaAlarm(){
-:
+        val dateTime: Date = Calendar.getInstance().time
         var alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlarmReciver::class.java)
+        val intent = Intent(this,AlarmReciver::class.java)
         var pendingIntent = PendingIntent.getBroadcast(this,0,intent,0)
+        var calendar = Calendar.getInstance()
+
         alarmManager.set(
-            AlarmManager.RTC_WAKEUP,300000,pendingIntent,
+            AlarmManager.RTC_WAKEUP,calendar.timeInMillis+300000,pendingIntent,
             //todo = devolver a 777600000
         )
         Application.pref.saveCuarentenaState(true)

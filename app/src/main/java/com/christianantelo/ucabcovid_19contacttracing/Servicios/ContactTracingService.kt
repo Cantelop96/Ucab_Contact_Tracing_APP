@@ -32,7 +32,7 @@ import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTI
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_SERVICIO
-import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
@@ -50,7 +50,7 @@ var isFirstStart = true
 class ContactTracingService : LifecycleService() {
 
     //Key List Generator
-    private val privateKey = Application.pref.getKey()
+    private val privateKey = pref.getKey()
     val random = Random(privateKey)
     fun getRandomList(random: Random): List<Int> =
         List(300) { random.nextInt() }
@@ -80,6 +80,7 @@ class ContactTracingService : LifecycleService() {
         intent?.let {
             when (it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
+                    pref.saveContactTracingState(true)
                     if (isFirstStart) {
                         handler.postDelayed({
                             startForegroundService()
@@ -92,7 +93,8 @@ class ContactTracingService : LifecycleService() {
                 }
                 ACTION_RESUME_SERVICE_DESPUES_DE_CUARENTENA -> {
 
-                    sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA)
+                    //sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA)
+                    pref.saveContactTracingState(true)
 
                     if (isFirstStart) {
                         handler.postDelayed({
@@ -107,6 +109,7 @@ class ContactTracingService : LifecycleService() {
     }
 
     private fun killService() {
+        handler.removeCallbacksAndMessages(null)
         isFirstStart = true
         stopContactTracing()
         stopForeground(true)
@@ -138,7 +141,7 @@ class ContactTracingService : LifecycleService() {
 
         startForeground(NOTIFICATION_ID_SERVICIO, notificationBuilder.build())
 
-        if (Application.pref.getContactTracingState()) {
+        if (pref.getContactTracingState()) {
             handler.post(scan)
             handler.post(changeKey)
         }
@@ -182,17 +185,6 @@ class ContactTracingService : LifecycleService() {
 
     )
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(notificationManager: NotificationManager) {
-        val channel =
-            NotificationChannel(
-                NOTIFICATION_CHANNEL_ID_SERVICIO,
-                NOTIFICATION_CHANNEL_NAME_SERVICIO,
-                IMPORTANCE_LOW
-            )
-        notificationManager.createNotificationChannel(channel)
-    }
-
     // Database fun
     private fun insertContact(contactTracing: ContactTracing) =
         lifecycleScope.launch {
@@ -208,7 +200,6 @@ class ContactTracingService : LifecycleService() {
         lifecycleScope.launch(Dispatchers.IO) {
             contactosCercanos = db.getAllContactSortByDate()
         }
-
 
     private fun agregarContactoALaBasedeDatos() {
         for (Device in Bluetooth_Devices) {
@@ -442,7 +433,29 @@ class ContactTracingService : LifecycleService() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(notificationManager: NotificationManager) {
+        val channel =
+            NotificationChannel(
+                NOTIFICATION_CHANNEL_ID_SERVICIO,
+                NOTIFICATION_CHANNEL_NAME_SERVICIO,
+                IMPORTANCE_LOW
+            )
+        notificationManager.createNotificationChannel(channel)
+    }
+
     //Configuracion Notificacion Infeccion
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun createNotificationChannelNotificacion(notificationManager: NotificationManager) {
+        val channel =
+            NotificationChannel(
+                NOTIFICATION_CHANNEL_ID_NOTIFICACION,
+                NOTIFICATION_CHANNEL_NAME_NOTIFICACION,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+        notificationManager.createNotificationChannel(channel)
+    }
+
     fun sendNotificatioInfeccion(notificationIDs: Int) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
                 as NotificationManager
@@ -483,16 +496,6 @@ class ContactTracingService : LifecycleService() {
         0
     )
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun createNotificationChannelNotificacion(notificationManager: NotificationManager) {
-        val channel =
-            NotificationChannel(
-                NOTIFICATION_CHANNEL_ID_NOTIFICACION,
-                NOTIFICATION_CHANNEL_NAME_NOTIFICACION,
-                NotificationManager.IMPORTANCE_HIGH
-            )
-        notificationManager.createNotificationChannel(channel)
-    }
 
 
 }

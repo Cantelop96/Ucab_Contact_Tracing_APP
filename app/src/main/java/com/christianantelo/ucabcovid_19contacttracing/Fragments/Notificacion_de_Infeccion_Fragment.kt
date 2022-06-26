@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.Navigation
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 import kotlinx.android.synthetic.main.fragment_notificacion_de__infeccion.*
@@ -33,7 +34,8 @@ class Notificacion_de_Infeccion_Fragment : Fragment() {
 
             (activity as MainActivity).stopContactTracing()
             (activity as MainActivity).setFinalizarCuarentenaAlarm()
-            Application.pref.saveCuarentenaState(true)
+            pref.saveCuarentenaState(true)
+            pref.saveContactTracingState(false)
         btn_return_to_main_notificacion_infeccion.setOnClickListener {
             Navigation.findNavController(it).navigate(R.id.action_notificacion_de_Infeccion_Fragment_to_main_View)
 

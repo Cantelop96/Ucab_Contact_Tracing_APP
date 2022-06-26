@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_first_time_key_gen.*
@@ -54,6 +55,7 @@ class FirstTimeKeyGen_Activity : AppCompatActivity() {
             btn_aceptarTerminosyCondiciones.setOnClickListener {
                 if (isBackgroundPermissionGranted) {
                     Application.pref.saveKey(privateKey)
+                    pref.saveContactTracingState(true)
                     Log.i("Inicio", "Clave Generada $privateKey")
                     goToMain()
                 } else {
