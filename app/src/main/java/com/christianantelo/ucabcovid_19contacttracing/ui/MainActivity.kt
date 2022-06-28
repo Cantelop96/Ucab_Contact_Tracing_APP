@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity() {
         var calendar = Calendar.getInstance()
 
         alarmManager.set(
-            AlarmManager.RTC_WAKEUP,calendar.timeInMillis+300000,pendingIntent,
+            AlarmManager.RTC_WAKEUP,calendar.timeInMillis+777600000,pendingIntent,
             //todo = devolver a 777600000
         )
         Application.pref.saveCuarentenaState(true)

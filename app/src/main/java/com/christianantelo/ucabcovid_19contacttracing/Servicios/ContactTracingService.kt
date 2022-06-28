@@ -157,7 +157,7 @@ class ContactTracingService : LifecycleService() {
     private val scan = object : Runnable {
         override fun run() {
             startBleScan()
-            handler.postDelayed(this, 60000) //Todo(Devolver valor a 150000 cuando termine el test)
+            handler.postDelayed(this, 300000) //Todo(Devolver valor a 300000 cuando termine el test)
         }
     }
 
@@ -172,7 +172,7 @@ class ContactTracingService : LifecycleService() {
             bluetoothAdapter.name = "$currentKey"
             startAdvertising(advertiseSettings, advertiseData, advertiseCallback)
             handler.postDelayed(this,
-                240000) //Todo(Cambiar a 3600000 cuando terminen las pruebas)
+                3600000) //Todo(Cambiar a 3600000 cuando terminen las pruebas)
 
         }
     }
@@ -205,7 +205,7 @@ class ContactTracingService : LifecycleService() {
         for (Device in Bluetooth_Devices) {
             Log.i(
                 "Test Distancia Callback",
-                "Dispocitivo Key publica ${Device.serviceData},\nRSSI: ${Device.RSSI} \nPower Level:${Device.txPowerLevel} \n Distancia ${Device.distance}"
+                "Dispocitivo Key publica ${Device.serviceData},\nRSSI: ${Device.RSSI} \nPower Level:${Device.txPowerLevel} \nDistancia ${Device.distance}"
             )
             if (Device.distance < 2) {
                 if (Bluetooth_Devices_D.contains(Device.serviceData)) {
@@ -236,7 +236,7 @@ class ContactTracingService : LifecycleService() {
     var firstscan = true
     private var scanning = false
     private val handler = Handler(Looper.getMainLooper())
-    private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg
+    private val SCAN_PERIOD: Long = 10000 //define tiempo de scan 10 seg todo = cambiar a 10000
 
 
     var filter = ScanFilter.Builder()
@@ -255,7 +255,7 @@ class ContactTracingService : LifecycleService() {
             if (!scanning) { // Stops scanning after a pre-defined scan period.
                 handler.postDelayed({
                     scanning = false
-                    Log.i("ScanCallback", "termino el Scan")
+                    Log.i("Test Distancia Callback", "termino el Scan")
                     bleScanner.stopScan(scanCallback)
                     scanResults.clear()
                     if (current_list == "A") {
@@ -291,7 +291,7 @@ class ContactTracingService : LifecycleService() {
                     agregarContactoALaBasedeDatos()
                 }, SCAN_PERIOD)
                 scanning = true
-                Log.i("ScanCallback", "empezo el Scan")
+                Log.i("Test Distancia Callback", "empezo el Scan")
                 bleScanner.stopScan(scanCallback)
                 bleScanner.startScan(devfilters, scanSettings, scanCallback)
             } else {
@@ -311,7 +311,7 @@ class ContactTracingService : LifecycleService() {
                 with(result.device) {
                     Log.i(
                         "ScanCallback",
-                        "Found BLE device! Name: ${name ?: "Unnamed"}, address: $address, RSSI: $rssi, TXPower: ${result.scanRecord!!.txPowerLevel}"
+                        "Found BLE device! Name: ${name ?: "Unnamed"}, \naddress: $address, \nRSSI: $rssi, TXPower: ${result.scanRecord!!.txPowerLevel}"
                     )
                 }
                 scanResults.add(result)
@@ -354,7 +354,7 @@ class ContactTracingService : LifecycleService() {
     private val advertiseSettings =
         AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
-            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW)
+            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
             .setConnectable(false)
             .build()
 

@@ -10,7 +10,7 @@ import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
 
 @Database(
     entities = [ContactTracing::class],
-    version = 5
+    version = 7
 )
 abstract class ContactTracingDatabase : RoomDatabase() {
     abstract fun getContactTracingDao(): ContactTracingDAO

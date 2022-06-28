@@ -18,7 +18,7 @@ data class ContactTracing(
     var serviceData: Int,
     var contactDate: Long,
 ) {
-    var exponent = ((-87.4 - RSSI) / (10 * 4))
+    var exponent = ((-71.3 - RSSI) / (10 * 2))
     var distance = base.toDouble().pow(exponent.toDouble())
 
     //var decodedServiceData = read4BytesFromBuffer(serviceData)

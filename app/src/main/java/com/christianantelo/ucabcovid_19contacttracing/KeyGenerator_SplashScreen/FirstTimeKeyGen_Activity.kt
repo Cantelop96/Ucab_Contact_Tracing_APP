@@ -54,7 +54,7 @@ class FirstTimeKeyGen_Activity : AppCompatActivity() {
             privateKey = read4BytesFromBuffer(pair.private.encoded).toLong()
             btn_aceptarTerminosyCondiciones.setOnClickListener {
                 if (isBackgroundPermissionGranted) {
-                    Application.pref.saveKey(privateKey)
+                    pref.saveKey(privateKey)
                     pref.saveContactTracingState(true)
                     Log.i("Inicio", "Clave Generada $privateKey")
                     goToMain()
