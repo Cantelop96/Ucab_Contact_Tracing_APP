@@ -70,6 +70,17 @@ class Main_View : Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (pref.getContactTracingState()) {
+            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Activo"
+            gif_imagen.setImageResource(R.drawable.radar)
+        } else {
+            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Desactivado"
+            gif_imagen.setImageResource(R.drawable.warning)
+        }
+    }
+
 
 
 }

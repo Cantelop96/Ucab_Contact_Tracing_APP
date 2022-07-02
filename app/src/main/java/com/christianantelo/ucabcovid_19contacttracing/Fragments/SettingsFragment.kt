@@ -71,4 +71,14 @@ class SettingsFragment : Fragment() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        sw_seguimiento_activado.isChecked = pref.getContactTracingState()
+        if (sw_seguimiento_activado.isChecked) {
+            sw_seguimiento_activado.text = "El Seguimiento de contactos cercanos esta Activado"
+        } else {
+            sw_seguimiento_activado.text = "El Seguimiento de contactos cercanos esta Desactivado"
+        }
+    }
 }
