@@ -62,6 +62,8 @@ class ResultadoPruebaPositivoFragment : Fragment() {
             Log.d("Subir Infectados",
                 "Saliendo de publicar el contacto infectado")
             (activity as MainActivity).stopContactTracing()
+            (activity as MainActivity).setFinalizarCuarentenaAlarm()
+            pref.saveCuarentenaState(true)
             pref.saveContactTracingState(false)
             Navigation.findNavController(it)
                 .navigate(R.id.action_resultadoPruebaPositivoFragment_to_main_View)

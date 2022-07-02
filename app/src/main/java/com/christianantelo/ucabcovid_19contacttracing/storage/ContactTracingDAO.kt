@@ -18,7 +18,7 @@ interface ContactTracingDAO {
     @Query("SELECT * FROM table_of_contacts ORDER BY contactDate DESC")
     suspend fun getAllContactSortByDate(): MutableList<ContactTracing>
 
-    @Query("DELETE FROM table_of_contacts WHERE (julianday('now') - julianday(contactDate))>14")
+    @Query("DELETE FROM table_of_contacts WHERE (julianday('now') - julianday(contactDate))>10")
     suspend fun borrarContactsMasde14Dias()
 
     @Query("DELETE FROM table_of_contacts")

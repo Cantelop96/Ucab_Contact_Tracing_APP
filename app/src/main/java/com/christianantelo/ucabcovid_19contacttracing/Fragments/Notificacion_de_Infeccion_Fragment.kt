@@ -32,10 +32,10 @@ class Notificacion_de_Infeccion_Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-            (activity as MainActivity).stopContactTracing()
+            /*(activity as MainActivity).stopContactTracing()
             (activity as MainActivity).setFinalizarCuarentenaAlarm()
             pref.saveCuarentenaState(true)
-            pref.saveContactTracingState(false)
+            pref.saveContactTracingState(false)*/
         btn_return_to_main_notificacion_infeccion.setOnClickListener {
             Navigation.findNavController(it).navigate(R.id.action_notificacion_de_Infeccion_Fragment_to_main_View)
 

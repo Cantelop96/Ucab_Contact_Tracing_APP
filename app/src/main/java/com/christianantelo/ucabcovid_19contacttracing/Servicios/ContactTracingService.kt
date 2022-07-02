@@ -17,7 +17,6 @@ import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.os.postDelayed
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -32,14 +31,12 @@ import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTI
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_CHANNEL_NAME_SERVICIO
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION_BLUETOOTH_DISABLE
-import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_SERVICIO
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.storage.ContactTracingDatabase
 import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
-import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity.Companion.bluetoothActivado
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +61,7 @@ class ContactTracingService : LifecycleService() {
     val db by lazy { ContactTracingDatabase.invoke(this).getContactTracingDao() }
     val fsdb = Firebase.firestore
     var contactosCercanos: MutableList<ContactTracing> = mutableListOf()
+    var contactosInfectados: MutableList<ContactTracing> = mutableListOf()
 
     companion object {
         val isInfected = MutableLiveData<Boolean>()
@@ -157,7 +155,6 @@ class ContactTracingService : LifecycleService() {
             killService()
             handler.removeCallbacksAndMessages(null)
             pref.saveContactTracingState(false)
-        } else {
         }
     }
 
@@ -209,6 +206,11 @@ class ContactTracingService : LifecycleService() {
     private fun insertContact(contactTracing: ContactTracing) =
         lifecycleScope.launch {
             with(Dispatchers.IO) { db.insertContact(contactTracing) }
+        }
+
+    private fun deleteContacts(contactTracing: ContactTracing) =
+        lifecycleScope.launch {
+            with(Dispatchers.IO) { db.deleteContact(contactTracing) }
         }
 
     private fun deleteOldContacts() =
@@ -336,15 +338,12 @@ class ContactTracingService : LifecycleService() {
                 if (current_list == "A") {
                     Bluetooth_Devices_A.add(
                         result.device.name.toInt()
-                        //read4BytesFromBuffer(result.scanRecord!!.getServiceData(ParcelUuid(
-                        // My_UUID))!!)
+
                     )
 
                 } else {
                     Bluetooth_Devices_B.add(
                         result.device.name.toInt()
-                        //read4BytesFromBuffer(result.scanRecord!!.getServiceData(ParcelUuid(
-                        //   My_UUID))!!)
                     )
                 }
                 //Get Contact Date
@@ -438,12 +437,20 @@ class ContactTracingService : LifecycleService() {
             .addOnFailureListener { exception ->
                 Log.w("Descarga Infectados", "Error getting documents.", exception)
             }
+        var infectado = false
         for (contacto in contactosCercanos) {
             if (publicKeyInfectadosCompleta.contains(contacto.serviceData)) {
-                sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION)
+                contactosInfectados.add(contacto)
                 isInfected.postValue(true)
-                break
+                infectado = true
             }
+        }
+        if(infectado){
+            for (contacto in contactosInfectados){
+                deleteContacts(contacto)
+            }
+            sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION)
+            contactosInfectados.clear()
         }
         if (isInfected.value == false) {
             publicKeyInfectadosCompleta.clear()

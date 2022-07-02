@@ -179,7 +179,6 @@ class MainActivity : AppCompatActivity() {
             contactosCercanos = db.getAllContactSortByDate()
         }
 
-    //todo = terminar de configurar logica de cuarentena con alarma
     internal fun setFinalizarCuarentenaAlarm(){
         val dateTime: Date = Calendar.getInstance().time
         var alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
@@ -188,8 +187,8 @@ class MainActivity : AppCompatActivity() {
         var calendar = Calendar.getInstance()
 
         alarmManager.set(
-            AlarmManager.RTC_WAKEUP,calendar.timeInMillis+777600000,pendingIntent,
-            //todo = devolver a 777600000
+            AlarmManager.RTC_WAKEUP,calendar.timeInMillis+1296000000,pendingIntent,
+            //todo = devolver a 1296000000
         )
         Application.pref.saveCuarentenaState(true)
     }
