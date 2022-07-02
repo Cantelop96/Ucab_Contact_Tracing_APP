@@ -16,19 +16,19 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="top"
-            android:layout_marginTop="40dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp">
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Seguimineto de Contactos Cercanos"
-                android:textSize="30dp"
+                android:text="Seguimiento de Contactos Cercanos"
+                android:textSize="20dp"
                 android:layout_marginVertical="10dp"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
+                android:textSize="16dp"
                 android:layout_marginVertical="10dp"
                 android:text="@string/Body_Settings"/>
             <LinearLayout
@@ -57,7 +57,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Eliminar toda mi informacion"
+                    android:text="Eliminar toda mi información"
                     android:textSize="16dp"
                     android:backgroundTint="@color/celeste"
                     android:textColor="@color/negro_fondo"/>

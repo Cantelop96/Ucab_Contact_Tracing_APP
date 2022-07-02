@@ -3,7 +3,7 @@
     <string name="sintomas">Sintomas</string>
     <string name="resultados_de_prueba">Resultados de Prueba</string>
     <string name="seguimiento_de_contactos_cercanos">Seguimiento de contactos cercanos</string>
-    <string name="sobre_la_aplicacion">Sobre la aplicacion</string>
+    <string name="sobre_la_aplicacion">Sobre la aplicación</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
@@ -18,11 +18,11 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="Sobre_el_App_Texto">Este es un prototipo de aplicacion desarrollado para el seguimiento de contactos cercanos de COVID-19. \n\nFunciona haciendo uso de Bluetooth Low Energy el cual utiliza la intencidad de la señal para identificar la distancia entre dispocitivos</string>
-    <string name="Compromiso_de_veracidad_resultado_de_prueba">La informacion que se introduzca en esta seccion es confidencial. \n\nEsta informacion es de un caracter sencible por esto usted se compromete a que la informacion que se introduzca en esta seccion es verdadera.\n\n</string>
-    <string name="Body_Settings">En esta ventana usted podra activar o desactivar el seguimiento de contactos cercanos</string>
-    <string name="Body_Resultado_prueba_positivo">Le pedimos que por favor se aisle usted y su familia, cumpla con todas las medidas de seguridas y contacte con un especialista en el tema.\n\n Para proteger su privacidad el seguimiento de contactos cercano sera detenido en este momento y se contactara a todas las personas con las que alla tenido contacto en los ultimos 15 dias.</string>
-    <string name="Body_eliminar_toda_la_informacion">Al hacer click en el boton de eliminar toda mi informacion se borraran todos los conatctos cercanos con los que se tuviese contacto y cualquier otra informacion que se suministrace dentro de la aplicacion.\n\nDespues de eliminada su informacion si desea usar nuevamente la aplicacion es necesario que se vuelva a realizar la configuracion inicial.</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Sobre_el_App_Texto">
+        Este es un prototipo de aplicación desarrollado para el seguimiento de contactos cercanos de COVID-19. \n\nFunciona haciendo uso de Bluetooth Low Energy el cual utiliza la intensidad de la señal para identificar la distancia entre dispositivos. \n\nSi se encuentra algún dispositivo a menos de 2 metros de distancia por más de 10 minutos este se registra en la base de datos del dispositivo. \n\nSi alguno de los contactos registrados en la base de datos indica un resultado positivo de COVID-19 la aplicación le indicara la posible infección y se detendrá el seguimiento de contactos cercanos durante un periodo de cuarentena de 9 días o hasta que se vuelva a iniciar desde los ajustes de la aplicación.
+</string>
+    <string name="Compromiso_de_veracidad_resultado_de_prueba">La información que se introduzca en esta sección es confidencial. \n\nEsta información es de un carácter sensible, por lo tanto usted se compromete a que la información que se introduzca en esta sección es verdadera.\n\n</string>
+    <string name="Body_Settings">En esta ventana usted podrá activar o desactivar el seguimiento de contactos cercanos o borrar completante la información de la aplicación.</string>
+    <string name="Body_Resultado_prueba_positivo">Le pedimos que por favor se aísle usted y su familia, cumpla con todas las medidas de seguridad y contacte con un especialista en el tema.\n\nPara proteger su privacidad el seguimiento de contactos cercano será detenido en este momento y se contactará a todas las personas con las que haya tenido contacto en los últimos 15 días.</string>
+    <string name="Body_eliminar_toda_la_informacion">Al hacer click en el botón de eliminar toda mi información se borrarán todos los contactos cercanos con los que se tuviese contacto y cualquier otra información que se suministrase dentro de la aplicación.\n\nDespués de eliminada su información si desea usar nuevamente la aplicación es necesario que se vuelva a realizar la configuración inicial.</string>
 </resources>

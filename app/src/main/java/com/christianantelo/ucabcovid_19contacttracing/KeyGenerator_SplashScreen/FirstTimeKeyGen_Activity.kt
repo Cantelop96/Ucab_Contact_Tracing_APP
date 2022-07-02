@@ -48,7 +48,6 @@ class FirstTimeKeyGen_Activity : AppCompatActivity() {
         val firsttime = Application.pref.getFirstTime()
         if (privateKey == "0".toLong()) {
             requestPermissions()
-            Application.pref.saveFirstTime(false) // persist value of false
             val generator = KeyPairGenerator.getInstance("RSA")
             val pair = generator.generateKeyPair()
             privateKey = read4BytesFromBuffer(pair.private.encoded).toLong()
@@ -61,7 +60,7 @@ class FirstTimeKeyGen_Activity : AppCompatActivity() {
                 } else {
                     Toast.makeText(
                         this,
-                        "Es necesario que se accepten los permisos para el correcto funcionamiento de la Aplicacion",
+                        "Es necesario que se acepten los permisos para el correcto funcionamiento de la aplicación. Puede habilitar los permisos en las configuraciones de su dispositivo",
                         Toast.LENGTH_SHORT
                     ).show()
                     requestPermissions()

@@ -30,6 +30,7 @@ import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.BACK
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.ENABLE_BLUETOOTH_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.LOCATION_PERMISSION_REQUEST_CODE
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.ContactTracing
 import com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen.FirstTimeKeyGen_Activity.Companion.isBackgroundPermissionGranted
 import com.christianantelo.ucabcovid_19contacttracing.KeyGenerator_SplashScreen.FirstTimeKeyGen_Activity.Companion.isLocationPermissionGranted
@@ -71,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         if (bluetoothAdapter == null) {
             Toast.makeText(
                 this,
-                "Este equipo no soporta el uso de Bluetooth, lo cual es indispensable para el funcionamiento de la aplicacion.",
+                "Este equipo no soporta el uso de Bluetooth, lo cual es indispensable para el funcionamiento de la aplicación.",
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -86,8 +87,9 @@ class MainActivity : AppCompatActivity() {
         Log.i("Callback 2.0",
             "isLocationPermissionGranted ${isLocationPermissionGranted}, isBackgroundPermissionGranted ${isBackgroundPermissionGranted} ")
 
-        if (isLocationPermissionGranted && isBackgroundPermissionGranted) {
+        if (isLocationPermissionGranted && isBackgroundPermissionGranted && pref.getContactTracingState() && bluetoothAdapter.isEnabled) {
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
+            pref.saveFirstTime(false)
         }
 
     }
@@ -115,7 +117,7 @@ class MainActivity : AppCompatActivity() {
             this.startService(it)
         }
 
-    private fun promptEnableBluetooth() {
+    internal fun promptEnableBluetooth() {
         if (!bluetoothAdapter.isEnabled) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
@@ -128,17 +130,21 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 if (bluetoothAdapter.isEnabled) {
                     bluetoothActivado.setValue(true)
-                    Toast.makeText(this, "Se a activado el Bluetooth.", Toast.LENGTH_SHORT).show()
+                    if (pref.getFirstTime()){
+                        sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
+                        pref.saveFirstTime(false)
+                    }
+                    Toast.makeText(this, "Se a encendido el Bluetooth.", Toast.LENGTH_SHORT).show()
                 } else {
                     bluetoothActivado.setValue(false)
-                    Toast.makeText(this, "No se ha activado el Bluetooth", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "No se ha encendido el Bluetooth", Toast.LENGTH_SHORT)
                         .show()
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 bluetoothActivado.setValue(false)
                 Toast.makeText(
                     this,
-                    "Se ha cancelado la activacion del Bluetooth",
+                    "Se ha cancelado el encendido del Bluetooth",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -146,7 +152,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Bluetooth Configuration
-    private val bluetoothAdapter: BluetoothAdapter by lazy {
+    internal val bluetoothAdapter: BluetoothAdapter by lazy {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }

@@ -52,9 +52,9 @@ class AlarmReciver : BroadcastReceiver() {
         val notificationBuilder =
             NotificationCompat.Builder(context!!, "AlarmId")
                 .setAutoCancel(false)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ucovid_icon)
                 .setContentText("UCAB Contact Tracing")
-                .setContentText("A finalizado su periodo de cuarentena para su comodidad hemos activado el seguimiento de contactos cercanos")
+                .setContentText("A finalizado su periodo de cuarentena para activar el seguimiento de contactos cercanos haga click en la notificación")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(getMainActivityPendingIntent())
 

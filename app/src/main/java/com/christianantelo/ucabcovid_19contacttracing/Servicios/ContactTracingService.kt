@@ -17,6 +17,7 @@ import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.os.postDelayed
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +31,7 @@ import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTI
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_CHANNEL_NAME_NOTIFICACION
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_CHANNEL_NAME_SERVICIO
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION
+import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION_BLUETOOTH_DISABLE
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA
 import com.christianantelo.ucabcovid_19contacttracing.Constantes.Constantes.NOTIFICATION_ID_SERVICIO
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
@@ -134,9 +136,9 @@ class ContactTracingService : LifecycleService() {
         val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID_SERVICIO)
             .setAutoCancel(false)
             .setOngoing(true)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ucovid_icon)
             .setContentText("UCAB Contact Tracing")
-            .setContentText("El seguimiento de contactos cercanos esta habilitado")
+            .setContentText("El seguimiento de contactos cercanos esta habilitado.")
             .setContentIntent(getMainActivityPendingIntent())
 
         startForeground(NOTIFICATION_ID_SERVICIO, notificationBuilder.build())
@@ -144,8 +146,19 @@ class ContactTracingService : LifecycleService() {
         if (pref.getContactTracingState()) {
             handler.post(scan)
             handler.post(changeKey)
+            handler.post(check)
         }
+    }
 
+    private fun bluetoothcheck(){
+        Log.i("check","${bluetoothAdapter.state}, is enable ${bluetoothAdapter.isEnabled}")
+        if (bluetoothAdapter.state == BluetoothAdapter.STATE_OFF) {
+            sendNotificatioInfeccion(NOTIFICATION_ID_NOTIFICACION_BLUETOOTH_DISABLE)
+            killService()
+            handler.removeCallbacksAndMessages(null)
+            pref.saveContactTracingState(false)
+        } else {
+        }
     }
 
     internal fun stopContactTracing() {
@@ -153,7 +166,14 @@ class ContactTracingService : LifecycleService() {
         bleScanner.stopScan(scanCallback)
     }
 
-    //Funcion que inicia un nuevo scan cas 2,5 min
+    private val check = object : Runnable {
+        override fun run() {
+            bluetoothcheck()
+            handler.postDelayed(this, 10000)
+        }
+    }
+
+    //Funcion que inicia un nuevo scan cas 5 min
     private val scan = object : Runnable {
         override fun run() {
             startBleScan()
@@ -249,55 +269,52 @@ class ContactTracingService : LifecycleService() {
         .build()
 
     private fun startBleScan() {
-        if (!bluetoothActivado.value!!) {
-            getMainActivityPendingIntent()//todo = revisar funcionalidad
-        } else {
-            if (!scanning) { // Stops scanning after a pre-defined scan period.
-                handler.postDelayed({
-                    scanning = false
-                    Log.i("Test Distancia Callback", "termino el Scan")
-                    bleScanner.stopScan(scanCallback)
-                    scanResults.clear()
-                    if (current_list == "A") {
-                        current_list = "B"
-                        if (!firstscan) {
-                            Bluetooth_Devices_C =
-                                Bluetooth_Devices_A.filter { Bluetooth_Devices_B.contains(it) } as MutableList<Int>
-                            Bluetooth_Devices_D.addAll(Bluetooth_Devices_C.filterNot {
-                                Bluetooth_Devices_D.contains(it)
-                            } as MutableList<Int>)
-                            Log.i("ScanCallback",
-                                "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
-                            Bluetooth_Devices_B.clear()
-                        }
-                    } else {
-                        current_list = "A"
-                        if (firstscan) {
-                            Bluetooth_Devices_D =
-                                Bluetooth_Devices_A.filter { (Bluetooth_Devices_B).contains(it) } as MutableList<Int>
-                            Bluetooth_Devices_C = Bluetooth_Devices_D
-                            firstscan = false
-                            Bluetooth_Devices_A.clear()
-                        } else {
-                            Bluetooth_Devices_C =
-                                Bluetooth_Devices_A.filter { Bluetooth_Devices_B.contains(it) } as MutableList<Int>
-                            Bluetooth_Devices_D.addAll(Bluetooth_Devices_C.filterNot {
-                                Bluetooth_Devices_D.contains(it)
-                            } as MutableList<Int>)
-                            Bluetooth_Devices_A.clear()
-                        }
-
-                    }
-                    agregarContactoALaBasedeDatos()
-                }, SCAN_PERIOD)
-                scanning = true
-                Log.i("Test Distancia Callback", "empezo el Scan")
-                bleScanner.stopScan(scanCallback)
-                bleScanner.startScan(devfilters, scanSettings, scanCallback)
-            } else {
+        bluetoothcheck()
+        if (!scanning) { // Stops scanning after a pre-defined scan period.
+            handler.postDelayed({
                 scanning = false
+                Log.i("Test Distancia Callback", "termino el Scan")
                 bleScanner.stopScan(scanCallback)
-            }
+                scanResults.clear()
+                if (current_list == "A") {
+                    current_list = "B"
+                    if (!firstscan) {
+                        Bluetooth_Devices_C =
+                            Bluetooth_Devices_A.filter { Bluetooth_Devices_B.contains(it) } as MutableList<Int>
+                        Bluetooth_Devices_D.addAll(Bluetooth_Devices_C.filterNot {
+                            Bluetooth_Devices_D.contains(it)
+                        } as MutableList<Int>)
+                        Log.i("ScanCallback",
+                            "Results\nlista A: $Bluetooth_Devices_A\nLista B: $Bluetooth_Devices_B\nLista C: $Bluetooth_Devices_C\nLista D: $Bluetooth_Devices_D")
+                        Bluetooth_Devices_B.clear()
+                    }
+                } else {
+                    current_list = "A"
+                    if (firstscan) {
+                        Bluetooth_Devices_D =
+                            Bluetooth_Devices_A.filter { (Bluetooth_Devices_B).contains(it) } as MutableList<Int>
+                        Bluetooth_Devices_C = Bluetooth_Devices_D
+                        firstscan = false
+                        Bluetooth_Devices_A.clear()
+                    } else {
+                        Bluetooth_Devices_C =
+                            Bluetooth_Devices_A.filter { Bluetooth_Devices_B.contains(it) } as MutableList<Int>
+                        Bluetooth_Devices_D.addAll(Bluetooth_Devices_C.filterNot {
+                            Bluetooth_Devices_D.contains(it)
+                        } as MutableList<Int>)
+                        Bluetooth_Devices_A.clear()
+                    }
+
+                }
+                agregarContactoALaBasedeDatos()
+            }, SCAN_PERIOD)
+            scanning = true
+            Log.i("Test Distancia Callback", "empezo el Scan")
+            bleScanner.stopScan(scanCallback)
+            bleScanner.startScan(devfilters, scanSettings, scanCallback)
+        } else {
+            scanning = false
+            bleScanner.stopScan(scanCallback)
         }
     }
 
@@ -466,23 +483,23 @@ class ContactTracingService : LifecycleService() {
             val notificationBuilder =
                 NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID_NOTIFICACION)
                     .setAutoCancel(false)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setSmallIcon(R.drawable.ucovid_icon)
                     .setContentText("UCAB Contact Tracing")
-                    .setContentText("Uno persona con la que estuvo en contacto resulto positivo para COVID-19")
+                    .setContentText("Una persona con la que estuvo en contacto resulto positivo para COVID-19")
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setContentIntent(getMainActivityPendingIntentNotificacion())
             notificationManager.notify(NOTIFICATION_ID_NOTIFICACION,
                 notificationBuilder.build())
         } else {
             val notificationBuilder =
-            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID_NOTIFICACION)
-                .setAutoCancel(false)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentText("UCAB Contact Tracing")
-                .setContentText("A finalizado su periodo de cuarentena para su comodidad hemos activado el seguimiento de contactos cercanos")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(getMainActivityPendingIntent())
-            notificationManager.notify(NOTIFICATION_ID_NOTIFICACION_FINALIZA_CUARNTENA,
+                NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID_NOTIFICACION)
+                    .setAutoCancel(true)
+                    .setSmallIcon(R.drawable.ucovid_icon)
+                    .setContentText("UCAB Contact Tracing")
+                    .setContentText("Se ha desactivado el Bluetooth, para el seguimiento de contactos cercano es necesario que el Bluetooth este activo en todo momento.")
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setContentIntent(getMainActivityPendingIntent())
+            notificationManager.notify(NOTIFICATION_ID_NOTIFICACION_BLUETOOTH_DISABLE,
                 notificationBuilder.build())
         }
     }
@@ -495,7 +512,6 @@ class ContactTracingService : LifecycleService() {
         },
         0
     )
-
 
 
 }

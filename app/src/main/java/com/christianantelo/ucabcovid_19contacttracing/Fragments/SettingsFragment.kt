@@ -50,6 +50,10 @@ class SettingsFragment : Fragment() {
 
         sw_seguimiento_activado.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
+                if (!(activity as MainActivity).bluetoothAdapter.isEnabled) {
+                    MainActivity.bluetoothActivado.setValue(false)
+                    (activity as MainActivity).promptEnableBluetooth()
+                }else{
                 if (!pref.getContactTracingState()) {
                     sw_seguimiento_activado.text =
                         "El Seguimiento de contactos cercanos esta Activado"
@@ -60,7 +64,7 @@ class SettingsFragment : Fragment() {
                     pref.saveContactTracingState(true)
                     Log.i("Settings", "Se activo el seguimiento contacto cercano")
                     (activity as MainActivity).startContactTracing()
-                }
+                }}
             } else {
                 sw_seguimiento_activado.text =
                     "El Seguimiento de contactos cercanos esta Desactivado"

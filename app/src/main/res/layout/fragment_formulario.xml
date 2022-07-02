@@ -9,9 +9,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
+        android:layout_marginLeft="30dp"
         android:layout_marginTop="20dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginRight="30dp"
         android:gravity="top"
         android:orientation="vertical">
 
@@ -19,16 +19,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="Selecciona los sintomas que posees"
-            android:textSize="30dp" />
+            android:text="Selecciona los síntomas que posees"
+            android:textSize="20dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="10dp"
-            android:text="Si no posee ninguno de estos sintomas, no es necesario que hagas nada por los momentos."
+            android:text="Si no posee ninguno de estos síntomas, no es necesario realizar ninguna acción por los momentos."
             android:textSize="15dp"
-            android:justificationMode="inter_word"/>
+            />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -50,9 +50,9 @@
                     android:paddingLeft="10dp"
                     android:button="@android:drawable/checkbox_off_background"
                     android:checked="false"
-                    android:text="Fiebre Alta:\nSignifica que se siente caliente al tacto en el pecho o en la espalda, no hace falta medir la temperatura con un termometro"
+                    android:text="Fiebre Alta:\nPresenta temperatura mayor a 38°C"
                     android:textSize="16dp"
-                    android:justificationMode="inter_word"/>
+                    />
 
                 <CheckBox
                     android:id="@+id/rb_tos"
@@ -61,10 +61,8 @@
                     android:layout_marginVertical="10dp"
                     android:paddingLeft="10dp"
                     android:button="@android:drawable/checkbox_off_background"
-                    android:text="Tos Frecuente:\nSignifica que lleva tosiendo constante mente por aproximadamente una hora, o tres o mas episodios de tos en 24 horas (Si usted normalmente posee tos, esta es peor a la tos usual)"
-                    android:textSize="16dp"
-                    android:justificationMode="inter_word"/>
-
+                    android:text="Tos Frecuente"
+                    android:textSize="16dp"/>
                 <CheckBox
                     android:id="@+id/rb_perdidadeOlfatoGusto"
                     android:layout_width="match_parent"
@@ -72,9 +70,9 @@
                     android:layout_marginVertical="10dp"
                     android:paddingLeft="10dp"
                     android:button="@android:drawable/checkbox_off_background"
-                    android:text="Perdida del Olfato o el Gusto:\nSignifica que no sientes sabor en las comidas o sientes olores"
+                    android:text="Perdida del Olfato o el Gusto"
                     android:textSize="16dp"
-                    android:justificationMode="inter_word"/>
+                    />
 
                 <Button
                     android:id="@+id/btnsiguente_sintomas_boton"

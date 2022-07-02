@@ -10,6 +10,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application
+import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Application.Companion.pref
 import com.christianantelo.ucabcovid_19contacttracing.DataClasses.Preferencias
 import com.christianantelo.ucabcovid_19contacttracing.R
 import com.christianantelo.ucabcovid_19contacttracing.ui.MainActivity
@@ -61,6 +62,7 @@ class ResultadoPruebaPositivoFragment : Fragment() {
             Log.d("Subir Infectados",
                 "Saliendo de publicar el contacto infectado")
             (activity as MainActivity).stopContactTracing()
+            pref.saveContactTracingState(false)
             Navigation.findNavController(it)
                 .navigate(R.id.action_resultadoPruebaPositivoFragment_to_main_View)
         }

@@ -26,17 +26,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
-                android:text="Usted Posee Alguno de los Sintomas del COVID-19"
-                android:textSize="30dp"
-                android:justificationMode="inter_word"/>
+                android:text="Usted Posee Alguno de los síntomas del COVID-19"
+                android:textSize="20dp"
+                />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
-                android:text="Sus sintomas sugieren que usted puede tener COVID-19 por lo que le aconsejamos que usted y su familia se aislen, esto significa quedarse en casa sin visitas. \n \n Tambien le aconsejamos que contacte a un organismo de salud para que un profesional evalue su condicion."
+                android:text="Sus síntomas sugieren que usted puede tener COVID-19 por lo que le aconsejamos que usted y su familia se aíslen, esto significa quedarse en casa sin visitas. \n \n También le aconsejamos que contacte a un organismo de salud para que un profesional evalué su condición."
                 android:textSize="20dp"
-                android:justificationMode="inter_word"/>
+                />
 
             <LinearLayout
                 android:layout_width="wrap_content"

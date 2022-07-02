@@ -33,12 +33,6 @@ class BorrarTodoConfirmationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object:
-            OnBackPressedCallback(true){
-            override fun handleOnBackPressed() {
-                findNavController().navigate(R.id.action_settingsFragment2_to_main_View)
-            }
-        })
         btn_delete_all_info_confirmado.setOnClickListener {
             pref.saveFirstTime(true)
             pref.saveKey(0)

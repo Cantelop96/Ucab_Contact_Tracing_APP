@@ -16,9 +16,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
             android:gravity="top"
             android:orientation="vertical">
 
@@ -26,8 +26,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
-                android:text="El Resultado de su Prueba dio positivo "
-                android:textSize="30dp" />
+                android:text="El resultado de su prueba es positivo"
+                android:textSize="20dp" />
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -45,9 +45,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginVertical="10dp"
-                        android:justificationMode="inter_word"
                         android:text="@string/Body_Resultado_prueba_positivo"
-                        android:textSize="20dp" />
+                        android:textSize="16dp" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"

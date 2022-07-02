@@ -16,9 +16,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
             android:gravity="top"
             android:orientation="vertical">
 
@@ -27,15 +27,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
                 android:text="Usted estuvo en contacto con una persona infectada de COVID-19"
-                android:textSize="30dp" />
+                android:textSize="20dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
-                android:justificationMode="inter_word"
-                android:text="Le pedimos que por favor se aisle usted y su familia, cumpla con todas las medidas de seguridas y contacte con un especialista en el tema.\n\n Para proteger su privacidad el seguimiento de contactos cercano sera detenido en este momento."
-                android:textSize="20dp" />
+                android:text="Le pedimos que por favor se aísle usted y su familia, cumpla con todas las medidas de bio-seguridad y contacte con un especialista en el tema.\n\nPara proteger su privacidad el seguimiento de contactos cercano será detenido en este momento. \n\nEl seguimiento de contactos cercanos se volverá a activar en 9 días."
+                android:textSize="16dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

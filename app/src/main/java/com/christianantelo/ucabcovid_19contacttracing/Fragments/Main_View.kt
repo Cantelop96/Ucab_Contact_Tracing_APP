@@ -33,10 +33,10 @@ class Main_View : Fragment() {
         return inflater.inflate(R.layout.fragment_main__view, container, false)
 
         if (pref.getContactTracingState()) {
-            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Activo"
+            tx_status_contactTracing.text = "El seguimiento de contactos cercanos esta Activo"
             gif_imagen.setImageResource(R.drawable.radar)
         } else {
-            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Desactivado"
+            tx_status_contactTracing.text = "El seguimiento de contactos cercanos esta Desactivado"
             gif_imagen.setImageResource(R.drawable.warning)
         }
     }
@@ -48,10 +48,10 @@ class Main_View : Fragment() {
 
 
         if (pref.getContactTracingState()) {
-            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Activo"
+            tx_status_contactTracing.text = "El ceguimiento de contactos cercanos esta Activo"
             gif_imagen.setImageResource(R.drawable.radar)
         } else {
-            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Desactivado"
+            tx_status_contactTracing.text = "El seguimiento de contactos cercanos esta Desactivado"
             gif_imagen.setImageResource(R.drawable.warning)
         }
 
@@ -73,10 +73,10 @@ class Main_View : Fragment() {
     override fun onResume() {
         super.onResume()
         if (pref.getContactTracingState()) {
-            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Activo"
+            tx_status_contactTracing.text = "El seguimiento de contactos cercanos esta Activo"
             gif_imagen.setImageResource(R.drawable.radar)
         } else {
-            tx_status_contactTracing.text = "El Seguimiento de Contactos Sercanos esta Desactivado"
+            tx_status_contactTracing.text = "El seguimiento de contactos cercanos esta Desactivado"
             gif_imagen.setImageResource(R.drawable.warning)
         }
     }
